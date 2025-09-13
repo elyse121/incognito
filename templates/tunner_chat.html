@@ -1,0 +1,465 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Secure Tunnel Chat</title>
+    <style>
+        body { 
+            font-family: 'Courier New', monospace; 
+            background: #0a0e17; 
+            color: #c7d2fe; 
+            margin: 0; 
+            padding: 20px; 
+            background-image: radial-gradient(circle at 15% 50%, #0f172a 0%, #0a0e17 100%);
+        }
+        .secure-container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid #2dd4bf;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 25px rgba(45, 212, 191, 0.15);
+            background: rgba(15, 23, 42, 0.95);
+        }
+        .secure-header {
+            background: linear-gradient(90deg, #0f172a 0%, #1e293b 100%);
+            padding: 15px 20px;
+            border-bottom: 1px solid #2dd4bf;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .secure-status {
+            display: flex;
+            align-items: center;
+            font-size: 0.9em;
+        }
+        .secure-indicator {
+            width: 10px;
+            height: 10px;
+            background: #2dd4bf;
+            border-radius: 50%;
+            margin-right: 8px;
+            box-shadow: 0 0 8px #2dd4bf;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        h2 { 
+            color: #2dd4bf; 
+            margin: 0;
+            font-size: 1.4em;
+            display: flex;
+            align-items: center;
+        }
+        h2::before {
+            content: "🔒 ";
+        }
+        #chatBox {
+            padding: 20px;
+            height: 400px;
+            overflow-y: auto;
+            margin-bottom: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(45, 212, 191, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(45, 212, 191, 0.05) 0%, transparent 20%);
+        }
+        .msg { 
+            margin: 0; 
+            padding: 12px 16px; 
+            border-radius: 8px; 
+            max-width: 70%; 
+            word-wrap: break-word;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        .sent { 
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); 
+            align-self: flex-end; 
+            color: white;
+            border: 1px solid #3b82f6;
+        }
+        .received { 
+            background: linear-gradient(135deg, #475569 0%, #334155 100%); 
+            align-self: flex-start; 
+            border: 1px solid #475569;
+        }
+        .archived {
+            opacity: 0.6;
+            filter: blur(1px);
+        }
+        .timestamp {
+            font-size: 0.7em;
+            opacity: 0.8;
+            margin-top: 4px;
+            display: block;
+            text-align: right;
+        }
+        .secure-footer {
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.8);
+            border-top: 1px solid #334155;
+        }
+        #chatInput { 
+            display: flex; 
+            gap: 12px; 
+        }
+        #msgInput { 
+            flex: 1; 
+            padding: 12px 16px; 
+            border: 1px solid #334155; 
+            border-radius: 8px; 
+            background: #0f172a;
+            color: #c7d2fe;
+            font-family: 'Courier New', monospace;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+        #msgInput:focus {
+            outline: none;
+            border-color: #2dd4bf;
+            box-shadow: 0 0 0 2px rgba(45, 212, 191, 0.2);
+        }
+        #sendBtn { 
+            padding: 12px 24px; 
+            background: linear-gradient(135deg, #2dd4bf 0%, #0d9488 100%); 
+            border: none; 
+            border-radius: 8px; 
+            color: #fff; 
+            cursor: pointer; 
+            transition: all 0.2s;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        #sendBtn:hover {
+            background: linear-gradient(135deg, #2dd4bf 0%, #0f766e 100%);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+            transform: translateY(-1px);
+        }
+        #sendBtn:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        .status-indicator {
+            font-size: 0.85em;
+            text-align: center;
+            color: #64748b;
+            margin: 5px 0;
+            font-style: italic;
+        }
+        .security-badge {
+            font-size: 0.75em;
+            background: rgba(45, 212, 191, 0.15);
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: #2dd4bf;
+        }
+        .message-security {
+            font-size: 0.7em;
+            text-align: right;
+            margin-top: 4px;
+            color: rgba(199, 210, 254, 0.6);
+        }
+        .message-security::before {
+            content: "✓ ";
+            color: #2dd4bf;
+        }
+        #viewArchivedBtn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #2dd4bf 0%, #0d9488 100%);
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            cursor: pointer;
+            display: none;
+            margin: 10px 0;
+        }
+        #viewArchivedBtn:hover {
+            background: linear-gradient(135deg, #2dd4bf 0%, #0f766e 100%);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+        }
+        /* Scrollbar styling */
+        #chatBox::-webkit-scrollbar {
+            width: 8px;
+        }
+        #chatBox::-webkit-scrollbar-track {
+            background: #0f172a;
+            border-radius: 4px;
+        }
+        #chatBox::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        #chatBox::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+<body>
+    <div class="secure-container">
+        <div class="secure-header">
+            <h2>Secure Tunnel with {{ other_user.username }}</h2>
+            <div class="secure-status">
+                <div class="secure-indicator"></div>
+                <span><a href="{% url 'posts' %}" style="text-decoration: none; color: #2563eb; font-weight: 600;">Kill Session</a></span>
+            </div>
+        </div>
+
+        <div id="chatBox">
+            <!-- messages will be populated here by JS -->
+            <p class="status-indicator">Establishing secure connection...</p>
+        </div>
+
+        <div class="secure-footer">
+            <button id="viewArchivedBtn">View Archived Messages</button>
+            <div id="chatInput">
+                <input id="msgInput" placeholder="Type an encrypted message..." autocomplete="off">
+                <button id="sendBtn">Encrypt & Send</button>
+            </div>
+            <p class="security-badge" style="margin-top: 12px; text-align: center;">
+                🔒 End-to-End Encrypted • Secure Tunnel Active
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const chatBox = document.getElementById("chatBox");
+        const msgInput = document.getElementById("msgInput");
+        const viewArchivedBtn = document.getElementById("viewArchivedBtn");
+        const currentUserId = {{ request.user.id }};
+        const maxRecentMessages = 10; // Show last 10 messages in full
+        let lastMessageId = null; // Track last message ID
+        let isUserScrolledUp = false; // Track if user has scrolled up
+        let showArchived = false; // Track if archived messages are visible
+
+        // CSRF Token function
+        function getCsrfToken() {
+            const name = "csrftoken";
+            const cookies = document.cookie.split(";");
+            for (let c of cookies) {
+                c = c.trim();
+                if (c.startsWith(name + "=")) return decodeURIComponent(c.substring(name.length + 1));
+            }
+            return null;
+        }
+
+        // Check if user has scrolled up and show/hide archived button
+        function checkScrollPosition() {
+            const threshold = 100; // 100px from bottom
+            const distanceFromBottom = chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight;
+            isUserScrolledUp = distanceFromBottom > threshold;
+
+            // Check if archived messages are visible in the viewport
+            const messages = chatBox.querySelectorAll('.msg.archived');
+            let hasArchivedInView = false;
+            messages.forEach(msg => {
+                const rect = msg.getBoundingClientRect();
+                const chatBoxRect = chatBox.getBoundingClientRect();
+                // Check if message is at least partially visible
+                if (rect.top < chatBoxRect.bottom && rect.bottom > chatBoxRect.top) {
+                    hasArchivedInView = true;
+                }
+            });
+
+            console.log('Scroll position check:', {
+                isUserScrolledUp,
+                hasArchivedInView,
+                messagesCount: messages.length,
+                showArchived
+            });
+
+            // Show/hide button
+            viewArchivedBtn.style.display = hasArchivedInView && !showArchived ? 'block' : 'none';
+        }
+
+        // Send message function
+        async function sendMessage() {
+            const content = msgInput.value.trim();
+            if (!content) return;
+
+            try {
+                const res = await fetch("{% url 'send_tunnel_message' chat_room_id=chat_room_id %}", {
+                    method: "POST",
+                    headers: { 
+                        "X-CSRFToken": getCsrfToken(),
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: new URLSearchParams({ content: content })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    msgInput.value = "";
+                    isUserScrolledUp = false; // Force scroll when sending
+                    fetchMessages(true); // Refresh after sending
+                } else {
+                    alert("Security Alert: " + data.error);
+                }
+            } catch (error) {
+                console.error("Error sending message:", error);
+                alert("Secure transmission failed. Please try again.");
+            }
+        }
+
+        // Fetch messages function
+        async function fetchMessages(forceScroll = false) {
+            try {
+                const res = await fetch("{% url 'fetch_messages' chat_room_id=chat_room_id %}");
+                const data = await res.json();
+
+                if (data.success) {
+                    console.log('Fetched messages:', data.messages.length);
+
+                    if (data.messages.length === 0) {
+                        chatBox.innerHTML = '<p class="status-indicator">Secure channel established. Begin your private conversation.</p>';
+                        viewArchivedBtn.style.display = 'none';
+                        return;
+                    }
+
+                    // Check for new messages
+                    const latestId = data.messages[data.messages.length - 1].id;
+                    if (latestId === lastMessageId && !forceScroll) {
+                        console.log('No new messages, preserving scroll');
+                        checkScrollPosition();
+                        return;
+                    }
+
+                    lastMessageId = latestId;
+                    const previousScrollHeight = chatBox.scrollHeight;
+                    const previousScrollTop = chatBox.scrollTop;
+
+                    chatBox.innerHTML = '';
+
+                    const totalMessages = data.messages.length;
+                    const archiveThreshold = Math.max(0, totalMessages - maxRecentMessages);
+
+                    data.messages.forEach((msg, index) => {
+                        const msgDiv = document.createElement("div");
+                        const isSent = msg.sender_id === currentUserId;
+                        const isArchived = index < archiveThreshold && !showArchived;
+
+                        msgDiv.className = `msg ${isSent ? 'sent' : 'received'} ${isArchived ? 'archived' : ''}`;
+
+                        const timestamp = new Date(msg.timestamp);
+                        const timeString = timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+                        const contentDisplay = isArchived ? '[Archived Content]' : msg.content;
+
+                        msgDiv.innerHTML = `
+                            <strong>${isSent ? 'You' : msg.sender}</strong>: ${contentDisplay}
+                            <span class="timestamp">${timeString}</span>
+                            <div class="message-security">End-to-end encrypted ${isArchived ? '• Archived' : ''}</div>
+                        `;
+                        chatBox.appendChild(msgDiv);
+                    });
+
+                    console.log('Rendered messages:', {
+                        totalMessages,
+                        archiveThreshold,
+                        showArchived
+                    });
+
+                    // Scroll logic
+                    const shouldScrollToBottom = forceScroll || (!isUserScrolledUp && lastMessageId !== null);
+                    if (shouldScrollToBottom) {
+                        setTimeout(() => {
+                            chatBox.scrollTop = chatBox.scrollHeight;
+                            viewArchivedBtn.style.display = 'none';
+                        }, 50);
+                    } else {
+                        const newScrollHeight = chatBox.scrollHeight;
+                        chatBox.scrollTop = previousScrollTop + (newScrollHeight - previousScrollHeight);
+                    }
+
+                    checkScrollPosition();
+                } else {
+                    chatBox.innerHTML = '<p class="status-indicator">Security protocol interrupted. Re-establishing connection...</p>';
+                    viewArchivedBtn.style.display = 'none';
+                }
+            } catch (error) {
+                console.error("Error fetching messages:", error);
+                chatBox.innerHTML = '<p class="status-indicator">Security protocol interrupted. Re-establishing connection...</p>';
+                viewArchivedBtn.style.display = 'none';
+            }
+        }
+
+        // Show profile code input modal (frontend-only)
+        function showProfileCodeModal() {
+            const modal = document.createElement("div");
+            modal.style.position = "fixed";
+            modal.style.top = "0";
+            modal.style.left = "0";
+            modal.style.width = "100%";
+            modal.style.height = "100%";
+            modal.style.background = "rgba(0, 0, 0, 0.7)";
+            modal.style.display = "flex";
+            modal.style.alignItems = "center";
+            modal.style.justifyContent = "center";
+            modal.style.zIndex = "1000";
+
+            const modalContent = document.createElement("div");
+            modalContent.style.background = "#0f172a";
+            modalContent.style.padding = "20px";
+            modalContent.style.borderRadius = "8px";
+            modalContent.style.border = "1px solid #2dd4bf";
+            modalContent.style.maxWidth = "400px";
+            modalContent.style.width = "90%";
+            modalContent.style.color = "#c7d2fe";
+
+            modalContent.innerHTML = `
+                <h3 style="margin-top: 0; color: #2dd4bf;">Enter Profile Code</h3>
+                <p>Enter your profile code to view archived messages.</p>
+                <input type="text" id="profileCodeInput" placeholder="e.g., A5-QW-1E" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #334155; border-radius: 4px; background: #1e293b; color: #c7d2fe;">
+                <button id="submitCodeBtn" style="padding: 10px 20px; background: linear-gradient(135deg, #2dd4bf 0%, #0d9488 100%); border: none; border-radius: 4px; color: #fff; cursor: pointer;">Submit</button>
+                <button id="cancelCodeBtn" style="padding: 10px 20px; margin-left: 10px; background: #334155; border: none; border-radius: 4px; color: #c7d2fe; cursor: pointer;">Cancel</button>
+            `;
+
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+
+            document.getElementById("submitCodeBtn").addEventListener("click", () => {
+                const profileCode = document.getElementById("profileCodeInput").value.trim();
+                if (!profileCode) {
+                    alert("Please enter a profile code.");
+                    return;
+                }
+                showArchived = true; // Show archived messages
+                fetchMessages(false); // Refresh without forcing scroll
+                document.body.removeChild(modal);
+                alert("Archived messages are now visible.");
+            });
+
+            document.getElementById("cancelCodeBtn").addEventListener("click", () => {
+                document.body.removeChild(modal);
+            });
+        }
+
+        // Add event listeners
+        document.getElementById("sendBtn").addEventListener("click", sendMessage);
+        msgInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") sendMessage();
+        });
+        chatBox.addEventListener('scroll', checkScrollPosition);
+        viewArchivedBtn.addEventListener("click", showProfileCodeModal);
+
+        // Initial fetch - scroll to bottom
+        fetchMessages(true);
+
+        // Connection status animation
+        const statusIndicator = document.querySelector(".secure-indicator");
+        setInterval(() => {
+            statusIndicator.style.animation = "none";
+            setTimeout(() => {
+                statusIndicator.style.animation = "pulse 2s infinite";
+            }, 10);
+        }, 5000);
+    </script>
+</body>
+</html>

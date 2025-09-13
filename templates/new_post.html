@@ -1,0 +1,516 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Post</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'images/bbbm.ico' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Base Variables */
+        :root {
+            --bg-color: #0f0f13;
+            --text-color: #ffffff;
+            --navbar-bg: #16161d;
+            --navbar-border: #2a2a3a;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --secondary: #818cf8;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --input-bg: #1a1b23;
+            --border-color: #3f3f52;
+            --placeholder: #94a3b8;
+            --container-bg: #16161d;
+            --card-bg: rgba(30, 30, 46, 0.6);
+            --box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(99, 102, 241, 0.1) 0%, transparent 25%);
+        }
+
+        .navbar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--navbar-bg);
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--navbar-border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-brand {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-brand i {
+            font-size: 1.1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            color: var(--text-color);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .nav-btn {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-btn.posts {
+            background-color: var(--primary);
+        }
+
+        .nav-btn.posts:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.logout {
+            background-color: var(--danger);
+        }
+
+        .nav-btn.logout:hover {
+            background-color: var(--danger-hover);
+            transform: translateY(-2px);
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 600px;
+            padding: 30px 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: var(--box-shadow);
+            border: 1px solid var(--border-color);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .card-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .card-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .card-subtitle {
+            color: var(--placeholder);
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .form-control::placeholder {
+            color: var(--placeholder);
+        }
+
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .file-upload {
+            position: relative;
+            margin-top: 8px;
+        }
+
+        .file-upload-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            background-color: var(--input-bg);
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .file-upload-label:hover {
+            border-color: var(--primary);
+        }
+
+        .file-upload-label i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+
+        .file-upload-label span {
+            color: var(--placeholder);
+        }
+
+        .file-upload-input {
+            position: absolute;
+            width: 0;
+            height: 0;
+            opacity: 0;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 10px 15px;
+            }
+            
+            .nav-brand {
+                font-size: 1.1rem;
+            }
+            
+            .user-info span {
+                display: none;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .card-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-links {
+                gap: 8px;
+            }
+            
+            .nav-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+            
+            .nav-btn span {
+                display: none;
+            }
+            
+            .nav-btn i {
+                margin-right: 0;
+            }
+            
+            .main-container {
+                padding: 15px;
+            }
+        }
+
+        /* File name display */
+        .file-name {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: var(--placeholder);
+            text-align: center;
+        }
+
+        /* Character counter */
+        .char-counter {
+            text-align: right;
+            font-size: 0.8rem;
+            color: var(--placeholder);
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{% url 'go-to-user5-chat' %}" class="nav-brand">
+            <i class="fas fa-comments"></i>
+            <span>Chatter</span>
+        </a>
+        
+        <div class="user-info">
+            <div class="user-avatar">{{ user.username|first|upper }}</div>
+            <span>Welcome, {{ user.username }}</span>
+        </div>
+        
+        <div class="nav-links">
+            <a href="/posts/" class="nav-btn posts">
+                <i class="fas fa-stream"></i>
+                <span>View Posts</span>
+            </a>
+            <a href="{% url 'logout' %}" class="nav-btn logout">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </nav>
+    
+    <div class="main-container">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title">Create New Post</h1>
+                <p class="card-subtitle">Share your thoughts with the community</p>
+            </div>
+            
+            <form method="POST" enctype="multipart/form-data" id="postForm">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="title" class="form-label">
+                        <i class="fas fa-heading"></i>
+                        <span>Title</span>
+                    </label>
+                    <input type="text" name="title" id="title" class="form-control" placeholder="Give your post a compelling title" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="content" class="form-label">
+                        <i class="fas fa-edit"></i>
+                        <span>Content</span>
+                    </label>
+                    <textarea name="content" id="content" class="form-control" placeholder="Express yourself..." required></textarea>
+                    <div class="char-counter"><span id="charCount">0</span>/2000 characters</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-image"></i>
+                        <span>Upload Image (Optional)</span>
+                    </label>
+                    <div class="file-upload">
+                        <input type="file" name="photo" id="photo" class="file-upload-input" accept="image/*">
+                        <label for="photo" class="file-upload-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Click or drag to upload an image</span>
+                        </label>
+                    </div>
+                    <div class="file-name" id="fileName">No file selected</div>
+                </div>
+                
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-paper-plane"></i>
+                    <span>Publish Post</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.getElementById("postForm");
+            const contentTextarea = document.getElementById("content");
+            const charCount = document.getElementById("charCount");
+            const fileInput = document.getElementById("photo");
+            const fileName = document.getElementById("fileName");
+            
+            // Character counter for content
+            contentTextarea.addEventListener("input", function() {
+                const length = this.value.length;
+                charCount.textContent = length;
+                
+                if (length > 1900) {
+                    charCount.style.color = "#ef4444";
+                } else {
+                    charCount.style.color = "";
+                }
+            });
+            
+            // File name display
+            fileInput.addEventListener("change", function() {
+                if (this.files.length > 0) {
+                    fileName.textContent = this.files[0].name;
+                } else {
+                    fileName.textContent = "No file selected";
+                }
+            });
+            
+            // Form validation
+            form.addEventListener("submit", function(event) {
+                const title = document.getElementById("title").value.trim();
+                const content = document.getElementById("content").value.trim();
+                
+                if (title === "" || content === "") {
+                    event.preventDefault();
+                    alert("Please fill in all required fields.");
+                    return;
+                }
+                
+                if (content.length > 2000) {
+                    event.preventDefault();
+                    alert("Content is too long. Maximum 2000 characters allowed.");
+                    return;
+                }
+            });
+            
+            // Drag and drop for file upload
+            const fileUploadLabel = document.querySelector('.file-upload-label');
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                fileUploadLabel.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                fileUploadLabel.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                fileUploadLabel.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight() {
+                fileUploadLabel.style.borderColor = '#6366f1';
+                fileUploadLabel.style.backgroundColor = 'rgba(99, 102, 241, 0.1)';
+            }
+            
+            function unhighlight() {
+                fileUploadLabel.style.borderColor = '';
+                fileUploadLabel.style.backgroundColor = '';
+            }
+            
+            fileUploadLabel.addEventListener('drop', handleDrop, false);
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                fileInput.files = files;
+                
+                if (files.length > 0) {
+                    fileName.textContent = files[0].name;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

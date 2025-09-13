@@ -1,0 +1,718 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Private Tunnel Chat</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #0f0f13;
+            --text-color: #ffffff;
+            --navbar-bg: #16161d;
+            --navbar-border: #2a2a3a;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --secondary: #818cf8;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --input-bg: #1a1b23;
+            --border-color: #3f3f52;
+            --placeholder: #94a3b8;
+            --container-bg: #16161d;
+            --card-bg: rgba(30, 30, 46, 0.6);
+            --box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(99, 102, 241, 0.1) 0%, transparent 25%);
+            padding: 20px;
+        }
+
+        .navbar {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--navbar-bg);
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid var(--navbar-border);
+            position: relative;
+        }
+
+        .nav-brand {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-brand i {
+            font-size: 1.1rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .nav-btn {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-btn.home {
+            background-color: var(--primary);
+        }
+
+        .nav-btn.home:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.logout {
+            background-color: var(--danger);
+        }
+
+        .nav-btn.logout:hover {
+            background-color: var(--danger-hover);
+            transform: translateY(-2px);
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: var(--box-shadow);
+            border: 1px solid var(--border-color);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .card-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .card-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .card-subtitle {
+            color: var(--placeholder);
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .form-control::placeholder {
+            color: var(--placeholder);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .security-badge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(99, 102, 241, 0.1);
+            padding: 16px;
+            border-radius: 12px;
+            margin: 20px 0;
+            color: var(--primary);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            text-align: center;
+            box-shadow: var(--box-shadow);
+            border: 1px solid var(--border-color);
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--placeholder);
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: var(--text-color);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .modal-subtitle {
+            color: var(--placeholder);
+            margin-bottom: 20px;
+        }
+
+        .otp-input-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .otp-input {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 1.2rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            transition: var(--transition);
+        }
+
+        .otp-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .timer {
+            margin: 15px 0;
+            font-size: 0.9rem;
+            color: var(--warning);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .alert-success {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 10px 15px;
+            }
+            
+            .nav-brand {
+                font-size: 1.1rem;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .card-title {
+                font-size: 1.5rem;
+            }
+            
+            .otp-input {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-links {
+                gap: 8px;
+            }
+            
+            .nav-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+            
+            .nav-btn span {
+                display: none;
+            }
+            
+            .nav-btn i {
+                margin-right: 0;
+            }
+            
+            .otp-input-container {
+                gap: 8px;
+            }
+            
+            .otp-input {
+                width: 35px;
+                height: 35px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="nav-brand">
+            <i class="fas fa-lock"></i>
+            <span>Secure Tunnel</span>
+        </a>
+        
+        <div class="nav-links">
+            <a href="/posts/" class="nav-btn home">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="{% url 'logout' %}" class="nav-btn logout">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </nav>
+    
+    <div class="main-container">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title">
+                    <i class="fas fa-user-secret"></i>
+                    Private Tunnel Chat
+                </h1>
+                <p class="card-subtitle">Secure end-to-end encrypted communication</p>
+            </div>
+            
+            <div id="alertContainer"></div>
+            
+            <div class="form-group">
+                <label for="recipientInput" class="form-label">
+                    <i class="fas fa-user-friends"></i>
+                    <span>Recipient Username</span>
+                </label>
+                <input type="text" id="recipientInput" class="form-control" placeholder="Enter username to chat with">
+            </div>
+            
+            <button id="createTunnelBtn" class="submit-btn">
+                <i class="fas fa-key"></i>
+                <span>Create Secure Tunnel</span>
+            </button>
+            
+            <div class="security-badge">
+                <i class="fas fa-shield-alt"></i>
+                <span>We'll send a verification code to the recipient for secure authentication</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- OTP Modal -->
+    <div id="otpModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" id="modalClose">&times;</span>
+            <h2 class="modal-title">
+                <i class="fas fa-shield-alt"></i>
+                Enter Verification Code
+            </h2>
+            <p class="modal-subtitle">Check your email for the 6-digit verification code</p>
+            
+            <div class="otp-input-container">
+                <input type="text" class="otp-input" maxlength="1" pattern="\d" inputmode="numeric" autocomplete="off">
+                <input type="text" class="otp-input" maxlength="1" pattern="\d" inputmode="numeric" autocomplete="off">
+                <input type="text" class="otp-input" maxlength="1" pattern="\d" inputmode="numeric" autocomplete="off">
+                <input type="text" class="otp-input" maxlength="1" pattern="\d" inputmode="numeric" autocomplete="off">
+                <input type="text" class="otp-input" maxlength="1" pattern="\d" inputmode="numeric" autocomplete="off">
+                <input type="text" class="otp-input" maxlength="1" pattern="\d" inputmode="numeric" autocomplete="off">
+            </div>
+            
+            <input type="hidden" id="otpCombinedInput">
+            <input type="hidden" id="tunnelIdInput">
+            
+            <div class="timer">
+                <i class="fas fa-clock"></i>
+                <span id="otpTimer">05:00</span>
+            </div>
+            
+            <button id="verifyOtpBtn" class="submit-btn">
+                <i class="fas fa-check"></i>
+                <span>Verify & Start Chat</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('otpModal');
+            const closeBtn = document.getElementById('modalClose');
+            const otpInputs = document.querySelectorAll('.otp-input');
+            const otpCombinedInput = document.getElementById('otpCombinedInput');
+            const tunnelIdInput = document.getElementById('tunnelIdInput');
+            const createTunnelBtn = document.getElementById('createTunnelBtn');
+            const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+            const alertContainer = document.getElementById('alertContainer');
+            let otpTimerInterval;
+
+            // Show alert function
+            function showAlert(message, type) {
+                const alert = document.createElement('div');
+                alert.className = `alert alert-${type}`;
+                alert.innerHTML = `
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                    <span>${message}</span>
+                `;
+                
+                alertContainer.appendChild(alert);
+                
+                // Remove alert after 5 seconds
+                setTimeout(() => {
+                    alert.remove();
+                }, 5000);
+            }
+
+            // Show modal function
+            function showModal() { 
+                modal.style.display = 'flex'; 
+                // Focus on first OTP input
+                setTimeout(() => otpInputs[0].focus(), 100);
+            }
+            
+            // Close modal function
+            function closeModal() { 
+                modal.style.display = 'none'; 
+                clearInterval(otpTimerInterval); 
+                // Reset OTP inputs
+                otpInputs.forEach(input => input.value = '');
+            }
+
+            // Close modal events
+            closeBtn.addEventListener('click', closeModal);
+            window.addEventListener('click', e => { 
+                if (e.target === modal) closeModal(); 
+            });
+
+            // OTP input handling
+            otpInputs.forEach((input, index) => {
+                input.addEventListener('input', e => {
+                    const value = e.target.value;
+                    
+                    // Only allow numbers
+                    if (!/^\d*$/.test(value)) {
+                        e.target.value = value.replace(/\D/g, '');
+                        return;
+                    }
+                    
+                    if (value.length === 1 && index < otpInputs.length - 1) {
+                        otpInputs[index + 1].focus();
+                    }
+                    
+                    updateCombinedOtp();
+                });
+                
+                input.addEventListener('keydown', e => {
+                    if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                        otpInputs[index - 1].focus();
+                    }
+                });
+                
+                input.addEventListener('paste', e => {
+                    e.preventDefault();
+                    const pasteData = e.clipboardData.getData('text').slice(0, 6);
+                    
+                    if (/^\d+$/.test(pasteData)) {
+                        for (let i = 0; i < pasteData.length; i++) {
+                            if (otpInputs[i]) {
+                                otpInputs[i].value = pasteData[i];
+                            }
+                        }
+                        
+                        if (pasteData.length < 6) {
+                            otpInputs[pasteData.length].focus();
+                        } else {
+                            otpInputs[5].focus();
+                        }
+                        
+                        updateCombinedOtp();
+                    }
+                });
+            });
+
+            function updateCombinedOtp() {
+                otpCombinedInput.value = Array.from(otpInputs).map(i => i.value).join('');
+            }
+
+            function startOtpTimer(duration) {
+                let timer = duration;
+                const timerElement = document.getElementById('otpTimer');
+                
+                // Update immediately
+                const minutes = Math.floor(timer / 60).toString().padStart(2, '0');
+                const seconds = (timer % 60).toString().padStart(2, '0');
+                timerElement.textContent = `${minutes}:${seconds}`;
+                
+                otpTimerInterval = setInterval(() => {
+                    const minutes = Math.floor(timer / 60).toString().padStart(2, '0');
+                    const seconds = (timer % 60).toString().padStart(2, '0');
+                    timerElement.textContent = `${minutes}:${seconds}`;
+                    
+                    if (--timer < 0) { 
+                        clearInterval(otpTimerInterval); 
+                        showAlert('Verification code has expired', 'error');
+                        closeModal(); 
+                    }
+                }, 1000);
+            }
+
+            // Create tunnel event
+            createTunnelBtn.addEventListener('click', async function() {
+                const recipient = document.getElementById('recipientInput').value.trim();
+                
+                if (!recipient) { 
+                    showAlert('Please enter a username', 'error');
+                    return; 
+                }
+                
+                // Show loading state
+                const originalText = createTunnelBtn.innerHTML;
+                createTunnelBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Tunnel...';
+                createTunnelBtn.disabled = true;
+                
+                try {
+                    const res = await fetch('/tunnel/initiate/', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json', 
+                            'X-CSRFToken': getCsrfToken() 
+                        },
+                        body: JSON.stringify({ recipient: recipient })
+                    });
+                    
+                    const data = await res.json();
+                    
+                    if (data.success) {
+                        tunnelIdInput.value = data.tunnel_id;
+                        showModal();
+                        startOtpTimer(300);
+                        showAlert('Tunnel created successfully. Check your email for the verification code.', 'success');
+                    } else { 
+                        showAlert(data.error || 'Failed to initiate tunnel', 'error');
+                    }
+                } catch (err) { 
+                    console.error(err);
+                    showAlert('Network error. Please try again.', 'error');
+                } finally {
+                    // Reset button state
+                    createTunnelBtn.innerHTML = originalText;
+                    createTunnelBtn.disabled = false;
+                }
+            });
+
+            // Verify OTP event
+            verifyOtpBtn.addEventListener('click', async function() {
+                updateCombinedOtp();
+                const otp = otpCombinedInput.value;
+                const tunnel_id = tunnelIdInput.value;
+                
+                if (!otp || otp.length !== 6) { 
+                    showAlert('Please enter a valid 6-digit code', 'error');
+                    return; 
+                }
+                
+                // Show loading state
+                const originalText = verifyOtpBtn.innerHTML;
+                verifyOtpBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+                verifyOtpBtn.disabled = true;
+                
+                try {
+                    const res = await fetch('/tunnel/verify-otp/', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCsrfToken() 
+                        },
+                        body: JSON.stringify({ otp, tunnel_id })
+                    });
+                    
+                    const data = await res.json();
+                    
+                    if (data.success) { 
+                        window.location.href = `/tunnel/chat/${data.chat_room_id}/`; 
+                    } else { 
+                        showAlert(data.error || 'Verification failed', 'error');
+                    }
+                } catch (err) { 
+                    console.error(err);
+                    showAlert('Network error. Please try again.', 'error');
+                } finally {
+                    // Reset button state
+                    verifyOtpBtn.innerHTML = originalText;
+                    verifyOtpBtn.disabled = false;
+                }
+            });
+
+            // CSRF token function
+            function getCsrfToken() {
+                const name = 'csrftoken';
+                const cookies = document.cookie.split(';');
+                
+                for (let c of cookies) { 
+                    c = c.trim(); 
+                    if (c.startsWith(name + '=')) return decodeURIComponent(c.substring(name.length + 1)); 
+                }
+                
+                return null;
+            }
+        });
+    </script>
+</body>
+</html>
