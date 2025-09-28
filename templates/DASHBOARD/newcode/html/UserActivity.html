@@ -1,0 +1,335 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - User Activity</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="{% static 'DASHBOARD/CSS/UserActivity.css' %}" rel="stylesheet">
+</head>
+<body>
+  <div class="container-fluid py-4">
+    <div class="row">
+      <div class="col-lg-11 col-xl-10 mx-auto">
+        <!-- Header -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+          <div class="mb-3 mb-md-0">
+            <h4 class="fw-bold mb-1">User Activity</h4>
+            <p class="text-muted mb-0">Monitor and manage all user actions in real-time</p>
+          </div>
+          <div class="d-flex gap-2">
+            <form method="get" class="d-flex align-items-center">
+              <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" 
+                      name="q" 
+                      value="{{ search_query }}" 
+                      class="form-control" 
+                      placeholder="Search users or activities..." 
+                      style="width: 240px;">
+              </div>
+
+              <!-- Keep filter if already selected -->
+              <input type="hidden" name="filter" value="{{ filter_type }}">
+            </form>
+
+            <div class="dropdown me-2">
+              <button class="btn btn-outline-primary d-flex align-items-center dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="fas fa-sliders-h me-1"></i> Filters
+              </button>
+              <ul class="dropdown-menu p-3" style="min-width: 250px;">
+                <!-- Date Range -->
+                <li>
+                  <label for="filterDate" class="form-label">Date Range</label>
+                  <select id="filterDate" class="form-select">
+                    <option value="">All</option>
+                    <option value="today">Today</option>
+                    <option value="yesterday">Yesterday</option>
+                    <option value="last7">Last 7 Days</option>
+                  </select>
+                </li>
+
+                <!-- User -->
+                <li class="mt-2">
+                  <label for="filterUser" class="form-label">User</label>
+                  <select id="filterUser" class="form-select">
+                    <option value="">All Users</option>
+                    {% for user in users %}
+                    <option value="{{ user.id }}">{{ user.username }}</option>
+                    {% endfor %}
+                  </select>
+                </li>
+
+                <!-- Action -->
+                <li class="mt-2">
+                  <label for="filterAction" class="form-label">Action</label>
+                  <select id="filterAction" class="form-select">
+                    <option value="">All Actions</option>
+                    <option value="logged in">Logged In</option>
+                    <option value="logged out">Logged Out</option>
+                    <option value="message">Message</option>
+                    <option value="report">Report</option>
+                  </select>
+                </li>
+
+                <li class="mt-3 d-grid">
+                  <button id="applyFilters" class="btn btn-primary">Apply Filters</button>
+                </li>
+              </ul>
+            </div>
+            <a href="{% url 'dashindex' %}" class="btn btn-outline-primary">
+              <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+            </a>
+          </div>
+        </div>
+        
+        <!-- Stats Row -->
+<div class="row g-3 mb-4">
+  <!-- Active Users -->
+  <div class="col-md-6 col-lg-3">
+    <div class="card stat-card">
+      <div class="stat-icon primary">
+        <i class="fas fa-users"></i>
+      </div>
+      <div>
+        <h6 class="text-muted mb-1">Active Users</h6>
+        <h3 class="mb-0">{{ stats.active_users }}</h3>
+        <span class="text-success small"><i class="fas fa-arrow-up"></i> 
+          {% comment %} You can calculate percentage change in view and pass it {% endcomment %}
+          12%
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div class="col-md-6 col-lg-3">
+    <div class="card stat-card">
+      <div class="stat-icon success">
+        <i class="fas fa-comment-dots"></i>
+      </div>
+      <div>
+        <h6 class="text-muted mb-1">Messages</h6>
+        <h3 class="mb-0">{{ stats.messages }}</h3>
+        {% if stats.percentage >= 0 %}
+          <span class="text-success small">
+            <i class="fas fa-arrow-up"></i> {{ stats.percentage }}%
+          </span>
+        {% else %}
+          <span class="text-danger small">
+            <i class="fas fa-arrow-down"></i> {{ stats.percentage_abs }}%
+          </span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Reports -->
+  <div class="col-md-6 col-lg-3">
+    <div class="card stat-card">
+      <div class="stat-icon danger">
+        <i class="fas fa-flag"></i>
+      </div>
+      <div>
+        <h6 class="text-muted mb-1">Reports</h6>
+        <h3 class="mb-0">{{ stats.reports }}</h3>
+
+        {% if stats.reports_percentage >= 0 %}
+          <span class="text-success small">
+            <i class="fas fa-arrow-up"></i> {{ stats.reports_percentage }}%
+          </span>
+        {% else %}
+          <span class="text-danger small">
+            <i class="fas fa-arrow-down"></i> {{ stats.reports_percentage_abs }}%
+          </span>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Avg. Session -->
+  <div class="col-md-6 col-lg-3">
+    <div class="card stat-card">
+      <div class="stat-icon warning">
+        <i class="fas fa-clock"></i>
+      </div>
+      <div>
+  <h6 class="text-muted mb-1">Avg. Session</h6>
+  <h3 class="mb-0">{{ stats.avg_session }}m</h3>
+
+  {% if stats.session_percentage >= 0 %}
+    <span class="text-success small">
+      <i class="fas fa-arrow-up"></i> {{ stats.session_percentage_abs }}%
+    </span>
+  {% else %}
+    <span class="text-danger small">
+      <i class="fas fa-arrow-down"></i> {{ stats.session_percentage_abs }}%
+    </span>
+  {% endif %}
+</div>
+
+    </div>
+  </div>
+</div>
+
+
+        
+        <!-- Main Content -->
+        <div class="row">
+          <!-- Activity Feed -->
+          <div class="col-lg-8 mb-4">
+            <div class="card">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                  <h5 class="mb-0">Recent Activity</h5>
+                <div>
+                <ul class="nav nav-pills">
+                  <li class="nav-item">
+                    <a class="nav-link {% if active_filter == 'All' %}active{% endif %}" href="?filter=All">All</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link {% if active_filter == 'Messages' %}active{% endif %}" href="?filter=Messages">Messages</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link {% if active_filter == 'Logins' %}active{% endif %}" href="?filter=Logins">Logins</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link {% if active_filter == 'Reports' %}active{% endif %}" href="?filter=Reports">Reports</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+                <!--- activity-list --->
+                <div class="activity-list">
+                  {% for activity in activities %}
+                  <div class="activity-item activity-{{ activity.action|lower }}">
+                    <div class="d-flex justify-content-between">
+                      <div class="d-flex align-items-center mb-2">
+                        <img src="{{ activity.avatar }}" class="avatar me-3">
+                        <div>
+                          <h6 class="mb-0">{{ activity.username }}</h6>
+                          <span class="text-muted small">{{ activity.action }}</span>
+                        </div>
+                      </div>
+                      <span class="text-muted small">{{ activity.timestamp|timesince }} ago</span>
+                    </div>
+                    <p class="mb-2">New device detected: {{ activity.device }}</p>
+                    <div>
+                      <button class="btn btn-sm action-btn btn-outline-secondary">Details</button>
+                    </div>
+                    
+                  </div>
+                  {% empty %}
+                  <p class="text-muted">No recent activity available.</p>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+            <!-- button pagination ---->
+            <div class="text-center mt-3">
+              <nav aria-label="Activity pagination">
+                <ul class="pagination justify-content-center mb-0">
+                  {% if page_obj.has_previous %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}&filter={{ active_filter }}&q={{ search_query }}">Previous</a>
+                  </li>
+                  {% else %}
+                  <li class="page-item disabled">
+                    <span class="page-link">Previous</span>
+                  </li>
+                  {% endif %}
+
+                  {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                      <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                      <li class="page-item"><a class="page-link" href="?page={{ num }}&filter={{ active_filter }}&q={{ search_query }}">{{ num }}</a></li>
+                    {% endif %}
+                  {% endfor %}
+
+                  {% if page_obj.has_next %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}&filter={{ active_filter }}&q={{ search_query }}">Next</a>
+                  </li>
+                  {% else %}
+                  <li class="page-item disabled">
+                    <span class="page-link">Next</span>
+                  </li>
+                  {% endif %}
+                </ul>
+              </nav>
+            </div>
+          </div>
+          
+
+          
+          <!-- Right Column -->
+          <div class="col-lg-4">
+            <!-- Active Users -->
+            <div class="card mb-4">
+            <div class="card-body">
+              <h5 class="mb-3">Top Active Users Today</h5>
+              {% for user in top_users %}
+              <div class="user-card mb-2">
+                <img src="{{ user.avatar }}" class="avatar me-3">
+                <div class="flex-grow-1">
+                  <h6 class="mb-0">{{ user.username }}</h6>
+                  <span class="text-muted small">{{ user.action_count }} actions today</span>
+                </div>
+                <span class="badge bg-primary rounded-pill">Active</span>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+            
+            <!-- Activity Chart -->
+            <div class="card">
+              <div class="card-body">
+                <h5 class="mb-3">Activity Timeline</h5>
+                <canvas id="activityTimelineChart"></canvas>
+              </div>
+            </div>
+
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+              const labels = JSON.parse('{{ timeline_labels|escapejs }}');
+              const data = JSON.parse('{{ timeline_data|escapejs }}');
+
+              const ctx = document.getElementById('activityTimelineChart').getContext('2d');
+              const activityChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                  labels: labels,
+                  datasets: [{
+                    label: 'User Actions',
+                    data: data,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    fill: true,
+                    tension: 0.3
+                  }]
+                },
+                options: {
+                  responsive: true,
+                  plugins: { legend: { display: true } },
+                  scales: { y: { beginAtZero: true } }
+                }
+              });
+            </script>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

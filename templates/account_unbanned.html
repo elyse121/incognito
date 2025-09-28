@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #d4edda; color: #155724; padding: 15px; text-align: center; }
+        .content { padding: 20px; background-color: #f9f9f9; }
+        .footer { margin-top: 20px; font-size: 0.9em; color: #6c757d; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Account Reactivation Notice</h2>
+        </div>
+        <div class="content">
+            <p>Dear {{ user.username }},</p>
+            <p>We're pleased to inform you that your account has been reactivated.</p>
+            <p>You may now log in and access all features as before.</p>
+            <p>Please review our community guidelines to ensure this doesn't happen again.</p>
+            <p>If you have any questions, contact us at <a href="mailto:{{ admin_email }}">{{ admin_email }}</a>.</p>
+            <p>Pass through this link to access your account, please<a href="http://127.0.0.1:8000/login/">Click here to login</a></p>
+        </div>
+        <div class="footer">
+            <p>This is an automated message. Please do not reply directly to this email.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,158 @@
+:root {
+      --primary: #4361ee;
+      --danger: #f72585;
+      --warning: #f77f00;
+      --success: #4cc9f0;
+      --dark: #212529;
+      --light: #f8f9fa;
+    }
+    
+    body {
+      background-color: #f5f7fb;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
+    .card {
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      transition: transform 0.2s;
+    }
+    
+    .card:hover {
+      transform: translateY(-2px);
+    }
+    
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .badge-pill {
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    
+    .activity-item {
+      border-left: 3px solid #e9ecef;
+      padding-left: 16px;
+      margin-bottom: 20px;
+      transition: all 0.2s;
+    }
+    
+    .activity-item:hover {
+      border-left-color: var(--primary);
+      background-color: rgba(67, 97, 238, 0.03);
+    }
+    
+    .activity-login {
+      border-left-color: var(--success);
+    }
+    
+    .activity-message {
+      border-left-color: var(--primary);
+    }
+    
+    .activity-report {
+      border-left-color: var(--danger);
+    }
+    
+    .activity-moderation {
+      border-left-color: var(--warning);
+    }
+    
+    .stat-card {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+    }
+    
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 16px;
+    }
+    
+    .stat-icon.primary {
+      background-color: rgba(67, 97, 238, 0.1);
+      color: var(--primary);
+    }
+    
+    .stat-icon.success {
+      background-color: rgba(76, 201, 240, 0.1);
+      color: var(--success);
+    }
+    
+    .stat-icon.danger {
+      background-color: rgba(247, 37, 133, 0.1);
+      color: var(--danger);
+    }
+    
+    .stat-icon.warning {
+      background-color: rgba(247, 127, 0, 0.1);
+      color: var(--warning);
+    }
+    
+    .nav-pills .nav-link.active {
+      background-color: var(--primary);
+    }
+    
+    .nav-pills .nav-link {
+      color: var(--dark);
+      font-weight: 500;
+    }
+    
+    .search-box {
+      position: relative;
+    }
+    
+    .search-box input {
+      padding-left: 40px;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
+    }
+    
+    .search-box i {
+      position: absolute;
+      left: 14px;
+      top: 12px;
+      color: #6c757d;
+    }
+    
+    .user-card {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    
+    .user-card:hover {
+      background-color: rgba(67, 97, 238, 0.05);
+    }
+    
+    .chart-placeholder {
+      height: 200px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #6c757d;
+    }
+    
+    .action-btn {
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }

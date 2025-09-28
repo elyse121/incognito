@@ -1,0 +1,126 @@
+body {
+      background-color: #f5f7fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .dashboard-header {
+      background-color: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 1rem 0;
+      margin-bottom: 2rem;
+    }
+    
+    /* Stats Cards */
+    .stats-card {
+      border-radius: 10px;
+      padding: 1.5rem;
+      color: white;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+    
+    .stats-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .stats-card.total-members {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .stats-card.banned-users {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .stats-card.active-users {
+      background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+    
+    .stats-card i {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .stats-card .count {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+    
+    .stats-card .label {
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+    
+    /* Member Table */
+    .member-table-container {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .member-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    
+    .status-badge {
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    
+    .status-active {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+    
+    .status-banned {
+      background-color: #fee2e2;
+      color: #b91c1c;
+    }
+    
+    .action-btn {
+      padding: 5px 10px;
+      font-size: 0.8rem;
+      margin-right: 5px;
+    }
+    
+    .table thead th {
+      background-color: #f8f9fa;
+      font-weight: 600;
+      border-top: none;
+    }
+    
+    .table-hover tbody tr:hover {
+      background-color: rgba(0, 0, 0, 0.02);
+    }
+    
+    /* Pagination */
+    .pagination .page-item.active .page-link {
+      background-color: #667eea;
+      border-color: #667eea;
+    }
+    
+    .pagination .page-link {
+      color: #667eea;
+    }
+    
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1100;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .stats-card {
+        margin-bottom: 1rem;
+      }
+    }

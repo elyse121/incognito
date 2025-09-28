@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Group Messages Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"/>
+    <style>
+        :root {
+          --bg-color: #ffffff;
+          --text-color: #12151a;
+          --sidebar-bg: #232829;
+          --chatbox-bg: #f8f9fa;
+          --message-sent-bg: #d9fdd3;
+          --message-received-bg: #ffffff;
+          --input-bg: #ffffff;
+          --border-color: #e9ecef;
+        }
+        
+        .dark-theme {
+          --bg-color: #0a1014;
+          --text-color: #e1e9ed;
+          --sidebar-bg: #1b262c;
+          --chatbox-bg: #1f2c33;
+          --message-sent-bg: #005c4b;
+          --message-received-bg: #202c33;
+          --input-bg: #2a3942;
+          --border-color: #303d45;
+        }
+        
+        body {
+          font-family: 'Segoe UI', Roboto, sans-serif;
+          background-color: #f5f7fa;
+          color: #333;
+          margin: 0;
+          padding: 0;
+        }
+        
+        .container-fluid {
+          padding: 20px;
+        }
+        
+        /* Group Avatar */
+        .group-avatar {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background-color: #007bff;
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+        }
+        
+        /* Group Details Panel */
+        #groupDetailsPanel {
+          display: {% if selected_group %}block{% else %}none{% endif %};
+          background-color: white;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          padding: 20px;
+          margin-top: 20px;
+          border-left: 4px solid #007bff;
+          animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .member-card {
+          margin-bottom: 15px;
+        }
+        
+        .member-card.reported .card {
+          border-left: 4px solid #dc3545;
+        }
+        
+        .user-avatar {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          object-fit: cover;
+        }
+        
+        .badge.active {
+          background-color: #28a745;
+        }
+        
+        .badge.banned {
+          background-color: #dc3545;
+        }
+        
+        .badge.inactive {
+          background-color: #6c757d;
+        }
+        
+        /* Table styling */
+        .group-table {
+          background-color: white;
+          border-radius: 8px;
+          overflow: hidden;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .table th {
+          border-top: none;
+          font-weight: 600;
+          color: #495057;
+          background-color: #f8f9fa;
+        }
+        
+        .table-hover tbody tr:hover {
+          background-color: rgba(0, 123, 255, 0.05);
+        }
+        
+        /* Back button */
+        .back-to-groups {
+          margin-bottom: 15px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+          .btn-group .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+          }
+          
+          .table th, .table td {
+            padding: 0.5rem;
+          }
+        }
+        
+        /* Loading spinner */
+        .spinner-border {
+          display: none;
+        }
+        
+        /* Active row highlighting */
+        .table tbody tr.active-group {
+          background-color: rgba(0, 123, 255, 0.1) !important;
+          border-left: 3px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <!-- Header -->
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+                    <h4 class="fw-bold mb-0"><i class="fas fa-users me-2"></i>Group Messages</h4>
+                    <div class="input-group" style="width: 250px;">
+                      <input type="text" id="searchInput" class="form-control" placeholder="Search by group_name...">
+                      <button class="btn btn-outline-secondary" id="searchBtn"><i class="fas fa-search"></i></button>
+                    </div>
+                    <a href="{% url 'dashindex' %}" class="btn btn-outline-primary">
+                      <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+                    </a>
+                </div>
+                
+                <!-- Back to Groups Button -->
+                <!-- Back to Groups Button -->
+                <button id="backToGroups" class="btn btn-outline-secondary back-to-groups"
+                    style="display: {% if selected_group %}inline-block{% else %}none{% endif %};">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Groups
+                </button>
+                <!-- Loading Spinner -->
+                <div id="loadingSpinner" class="d-flex justify-content-center my-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+                
+                <!-- Main Groups Table -->
+                <div class="group-table mb-4" id="groupsTable">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Group</th>
+                                <th>Members</th>
+                                <th>Last Activity</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <!-- Inside your tbody -->
+                      <tbody id="groupsTableBody">
+                      {% if groups %}
+                          {% for group in groups %}
+                          <tr id="group-{{ group.id }}" class="{% if selected_group and selected_group.id == group.id %}active-group{% endif %}">
+                              <td>
+                                  <div class="d-flex align-items-center gap-3">
+                                      <div class="group-avatar">{{ group.name|slice:":2"|upper }}</div>
+                                      <span class="fw-bold">{{ group.name }}</span>
+                                  </div>
+                              </td>
+                              <td><span class="badge bg-light text-dark">{{ group.membersCount }} members</span></td>
+                              <td>
+                                  {% if group.lastActivity %}
+                                      {{ group.lastActivity|date:"M d, Y H:i" }}
+                                  {% else %}-{% endif %}
+                              </td>
+                              <td>
+                                  <span class="badge 
+                                      {% if group.status == 'active' %}bg-success
+                                      {% elif group.status == 'archived' %}bg-secondary
+                                      {% else %}bg-warning text-dark{% endif %}">
+                                      {{ group.status|title }}
+                                  </span>
+                              </td>
+                              <td>
+                                  <a href="#" class="btn btn-sm btn-outline-primary view-group" data-group-id="{{ group.id }}">
+                                      <i class="fas fa-eye"></i> View Members
+                                  </a>
+                                  
+                                  <button class="btn btn-sm btn-outline-success view-messages" data-group-id="{{ group.id }}">
+                                      <i class="fas fa-comments"></i> View Messages
+                                  </button>
+                                  <button class="btn btn-sm btn-outline-danger delete-group" data-group-id="{{ group.id }}">
+                                      <i class="fas fa-trash"></i> Delete
+                                  </button>
+                              </td>
+                          </tr>
+
+                          <!-- Members Row -->
+                          <tr id="members-row-{{ group.id }}" style="display:none;">
+                              <td colspan="5">
+                                  <div class="mb-2 d-flex justify-content-between">
+                                      <input type="text" class="form-control form-control-sm w-50" 
+                                            placeholder="Search members..." id="member-search-{{ group.id }}">
+                                      <small class="text-muted align-self-center">Members: {{ group.members.count }}</small>
+                                  </div>
+                                  <ul class="list-group" id="members-container-{{ group.id }}">
+                                      {% for member in group.members.all %}
+                                          <li class="list-group-item d-flex justify-content-between align-items-center">
+                                              <span>{{ member.username }}</span>
+                                              <form method="POST" action="{% url 'remove_member' group.id member.id %}" style="display:inline;">
+                                                  {% csrf_token %}
+                                                  <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Remove this member from the group?');">
+                                                      Remove
+                                                  </button>
+                                              </form>
+                                          </li>
+                                      {% empty %}
+                                          <li class="list-group-item"><em>No members yet.</em></li>
+                                      {% endfor %}
+                                  </ul>
+                              </td>
+                          </tr>
+
+                      <!-- Messages Row -->
+                      <tr id="messages-row-{{ group.id }}" style="display:none;">
+                          <td colspan="5">
+                              <div class="mb-2">
+                                  <input type="text" class="form-control form-control-sm" 
+                                        placeholder="Search messages..." id="message-search-{{ group.id }}">
+                              </div>
+                              <ul class="list-group" id="messages-container-{{ group.id }}">
+                                  <li class="list-group-item">Loading messages...</li>
+                              </ul>
+                          </td>
+                      </tr>
+
+                      {% endfor %}
+
+                      {% else %}
+                      <tr>
+                          <td colspan="5" class="text-center text-muted">No groups found.</td>
+                      </tr>
+                      {% endif %}
+                      </tbody>
+                    </table>
+                </div>        
+              </div>
+            </div>
+    
+    <!-- Custom JavaScript -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          const groupsTable = document.getElementById('groupsTable');
+          const loadingSpinner = document.getElementById('loadingSpinner');
+          let activePanel = null; // currently visible row
+
+          // Show / hide loading
+          function showLoading() {
+              loadingSpinner.style.display = 'flex';
+              groupsTable.style.opacity = '0.5';
+          }
+          function hideLoading() {
+              loadingSpinner.style.display = 'none';
+              groupsTable.style.opacity = '1';
+          }
+
+          // Toggle panel display
+          function togglePanel(rowId, fetchUrl = null) {
+              const row = document.getElementById(rowId);
+
+              if (activePanel === row) {
+                  row.style.display = 'none';
+                  activePanel = null;
+                  return;
+              }
+              if (activePanel) activePanel.style.display = 'none';
+
+              row.style.display = '';
+              activePanel = row;
+
+              if (fetchUrl) {
+                  const container = row.querySelector('ul');
+                  container.innerHTML = '<li class="list-group-item">Loading...</li>';
+
+                  fetch(fetchUrl)
+                      .then(res => res.json())
+                      .then(data => {
+                          container.innerHTML = data.messages.length
+                              ? data.messages.map(m => `<li class="list-group-item"><strong>${m.sender}:</strong> ${m.text} <small class="text-muted">${m.timestamp}</small></li>`).join('')
+                              : '<li class="list-group-item"><em>No messages yet.</em></li>';
+                      });
+              }
+          }
+
+          // View Members
+          document.querySelectorAll('.view-group').forEach(btn => {
+              btn.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  const groupId = this.dataset.groupId;
+                  togglePanel(`members-row-${groupId}`);
+                   
+              });
+          });
+
+        document.querySelectorAll('.view-messages').forEach(btn => {
+          btn.addEventListener('click', function() {
+              const groupId = this.dataset.groupId;
+              if (!groupId) {
+                  console.error("Group ID is missing on button:", this);
+                  return;
+              }
+
+              const fetchUrl = `/chat/group/messages/${groupId}/`; 
+              togglePanel(`messages-row-${groupId}`, fetchUrl);
+          });
+      });
+
+      function togglePanel(rowId, fetchUrl = null) {
+          const row = document.getElementById(rowId);
+          if (!row) {
+              console.error("Row not found:", rowId);
+              return;
+          }
+
+          if (activePanel === row) {
+              row.style.display = 'none';
+              activePanel = null;
+              return;
+          }
+          if (activePanel) activePanel.style.display = 'none';
+
+          row.style.display = '';
+          activePanel = row;
+
+          if (fetchUrl) {
+              const container = row.querySelector('ul');
+              container.innerHTML = '<li class="list-group-item">Loading...</li>';
+
+              fetch(fetchUrl)
+                  .then(res => {
+                      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                      return res.json();
+                  })
+                  .then(data => {
+                      if (!data.messages) data.messages = [];
+                      container.innerHTML = data.messages.length
+                          ? data.messages.map(m => `
+                              <li class="list-group-item">
+                                  <strong>${m.sender}:</strong> ${m.text} 
+                                  <small class="text-muted">${m.timestamp}</small>
+                              </li>`).join('')
+                          : '<li class="list-group-item"><em>No messages yet.</em></li>';
+                  })
+                  .catch(err => {
+                      console.error(err);
+                      container.innerHTML = '<li class="list-group-item text-danger">Failed to load messages.</li>';
+                  });
+          }
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+
+          // Members Search
+          document.querySelectorAll('[id^="member-search-"]').forEach(input => {
+              input.addEventListener('keyup', function() {
+                  const groupId = this.id.split('-').pop();
+                  const filter = this.value.toLowerCase();
+                  document.querySelectorAll(`#members-container-${groupId} li`).forEach(li => {
+                      const username = li.querySelector('span')?.textContent.toLowerCase() || '';
+                      li.style.display = username.includes(filter) ? '' : 'none';
+                  });
+              });
+          });
+
+          // Remove member
+
+      document.addEventListener("DOMContentLoaded", function() {
+
+          const csrftoken = "{{ csrf_token }}"; // from template
+
+          document.querySelectorAll(".remove-member").forEach(btn => {
+              btn.addEventListener("click", function() {
+                  const groupId = this.dataset.groupId;
+                  const userId = this.dataset.memberId;
+                  const li = this.closest("li");
+
+                  if (!confirm("Remove this member from the group?")) return;
+
+                  console.log("Removing member", userId, "from group", groupId);
+
+                  fetch(`/GroupMessages/${groupId}/remove/${userId}/`, {
+                      method: "POST",
+                      headers: {
+                          "Content-Type": "application/json",
+                          "X-CSRFToken": csrftoken
+                      },
+                  })
+                  .then(res => {
+                      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+                      return res.json();
+                  })
+                  .then(data => {
+                      if (data.success) {
+                          li.remove();
+                          alert("Member removed!");
+                      } else {
+                          alert("Failed to remove member.");
+                      }
+                  })
+                  .catch(err => {
+                      console.error(err);
+                      alert("Error occurred.");
+                  });
+              });
+          });
+      });
+
+
+          // Messages Search
+          document.querySelectorAll('[id^="message-search-"]').forEach(input => {
+              input.addEventListener('keyup', function() {
+                  const groupId = this.id.split('-').pop();
+                  const filter = this.value.toLowerCase();
+                  document.querySelectorAll(`#messages-container-${groupId} li`).forEach(li => {
+                      const text = li.textContent.toLowerCase();
+                      li.style.display = text.includes(filter) ? '' : 'none';
+                  });
+              });
+          });
+
+          // CSRF helper
+          function getCookie(name) {
+              let cookieValue = null;
+              if (document.cookie && document.cookie !== '') {
+                  const cookies = document.cookie.split(';');
+                  for (let i = 0; i < cookies.length; i++) {
+                      const cookie = cookies[i].trim();
+                      if (cookie.startsWith(name + '=')) {
+                          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                          break;
+                      }
+                  }
+              }
+              return cookieValue;
+          }
+
+      });
+
+
+          // Delete group
+          document.querySelectorAll('.delete-group').forEach(btn => {
+              btn.addEventListener('click', function() {
+                  const groupId = this.dataset.groupId;
+                  const groupName = this.closest('tr').querySelector('.fw-bold').textContent;
+                  if (confirm(`Are you sure you want to delete "${groupName}"?`)) {
+                      showLoading();
+                      setTimeout(() => {
+                          alert(`Group "${groupName}" would be deleted here.`);
+                          hideLoading();
+                      }, 1000);
+                  }
+              });
+          });
+
+          // Search
+          document.getElementById('searchBtn').addEventListener('click', function() {
+              const term = document.getElementById('searchInput').value.toLowerCase();
+              document.querySelectorAll('#groupsTableBody tr').forEach(row => {
+                  const nameEl = row.querySelector('.fw-bold');
+                  if (!nameEl) return; // skip rows without group name
+                  row.style.display = nameEl.textContent.toLowerCase().includes(term) ? '' : 'none';
+              });
+          });
+
+          document.getElementById('searchInput').addEventListener('keyup', function(e){
+              if (e.key === 'Enter') document.getElementById('searchBtn').click();
+          });
+
+          hideLoading();
+      });
+    </script>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

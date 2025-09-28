@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'chat',
     'users',
+    'dashboard',
+    'mathfilters',
 ]
 
 # ------------------- Middleware -------------------
@@ -61,6 +63,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'dashboard.middleware.BanCheckMiddleware',
 ]
 
 # ------------------- URLs -------------------
@@ -130,9 +134,11 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'elyseniyonzima202@gmail.com'
-EMAIL_HOST_PASSWORD = 'nugo edas jjnb zcga'  # ⚠️ Consider using environment variables
+EMAIL_HOST_PASSWORD = 'hmpb boix dpkx acvt'  # ⚠️ Consider using environment variables
 
 # ------------------- Session Security -------------------
 SESSION_COOKIE_SECURE = True   # Requires HTTPS
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SECURE = True  # For HTTPS
+CSRF_COOKIE_SAMESITE = 'Lax'

@@ -10,24 +10,103 @@ from users.models import TunnelSession
 
 # ------------------ GROUP CHAT ------------------
 
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.db.models import Q
+from .models import Group, GroupChat
+from django.contrib.auth.models import User
+
 @login_required
-def group_chat_view(request):
-    search_query = request.GET.get("search", "")
+def group_chat_view(request, group_name=None):
+    if not group_name:
+        # Redirect to a default group or show an error
+        first_group = Group.objects.first()
+        if first_group:
+            return redirect('group_chat', group_name=first_group.name)
+        else:
+            return render(request, "group_chat.html", {"messages": [], "group": None})
+
+    group = get_object_or_404(Group, name=group_name)
 
     if request.method == "POST":
         message = request.POST.get("message")
         if message:
-            GroupChat.objects.create(sender=request.user, message=message)
+            GroupChat.objects.create(group=group, sender=request.user, message=message)
+            return redirect('group_chat', group_name=group.name)
 
-    messages = GroupChat.objects.all().order_by("timestamp")
+    messages = GroupChat.objects.filter(group=group).order_by("timestamp")
 
-    if search_query:
-        messages = messages.filter(Q(message__icontains=search_query))
+    return render(request, "group_chat.html", {"messages": messages, "group": group})
+
+#exit group view
+from django.contrib import messages
+
+@login_required
+def exit_group(request, group_id):
+    group = get_object_or_404(Group, id=group_id)
+    user = request.user
+    if user in group.members.all():
+        group.members.remove(user)
+        messages.success(request, f'You have exited {group.name}')
+    return redirect('group_chat')  # Redirect to group list or first group
+
+
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.db.models import Count, Max
+from django.contrib.auth.decorators import login_required
+from .models import Group, GroupChat
+
+@login_required
+def group_chat_view(request, group_name=None):
+    """
+    Show all groups where user is a member.
+    If group_name is provided, display that group's messages.
+    """
+    user = request.user
+
+    # Only groups where the logged-in user is a member
+    groups = (
+        Group.objects.filter(members=user)
+        .annotate(
+            membersCount=Count('members', distinct=True),
+            lastActivity=Max('messages__timestamp')
+        )
+        .prefetch_related('members', 'messages', 'creator')
+    )
+
+    if not group_name:
+        # If no group_name in URL, redirect to the first group the user belongs to
+        first_group = groups.first()
+        if first_group:
+            return redirect('group_chat', group_name=first_group.name)
+        else:
+            # User has no groups
+            return render(request, "group_chat.html", {
+                "messages": [],
+                "group": None,
+                "groups": groups
+            })
+
+    # Ensure user belongs to this group
+    group = get_object_or_404(Group, name=group_name, members=user)
+
+    # Handle new message
+    if request.method == "POST":
+        message = request.POST.get("message")
+        if message:
+            GroupChat.objects.create(group=group, sender=user, message=message)
+            return redirect('group_chat', group_name=group.name)
+
+    # Fetch all messages in this group
+    messages = GroupChat.objects.filter(group=group).order_by("timestamp")
 
     return render(request, "group_chat.html", {
         "messages": messages,
-        "search_query": search_query
+        "group": group,
+        "groups": groups
     })
+
 
 
 @login_required
@@ -48,6 +127,22 @@ def chat_room(request, room_name):
     search_query = request.GET.get('search', '') 
     users = User.objects.exclude(id=request.user.id)
 
+    # ✅ Handle sending new messages (text or media)
+    if request.method == "POST":
+        content = request.POST.get("content", "")
+        media = request.FILES.get("media", None)
+
+        if content or media:
+            receiver = get_object_or_404(User, username=room_name)
+            Message.objects.create(
+                sender=request.user,
+                receiver=receiver,
+                content=content if content else None,
+                media=media if media else None
+            )
+        return redirect("chat", room_name=room_name)
+
+    # ✅ Fetch chat history
     chats = Message.objects.filter(
         (Q(sender=request.user) & Q(receiver__username=room_name)) |
         (Q(receiver=request.user) & Q(sender__username=room_name))
@@ -58,6 +153,7 @@ def chat_room(request, room_name):
 
     chats = chats.order_by('timestamp')
 
+    # ✅ Build sidebar last messages
     user_last_messages = []
     for user in users:
         last_message = Message.objects.filter(
@@ -88,6 +184,7 @@ def chat_room(request, room_name):
         'special_message': special_message,
     }
     return render(request, 'chat.html', context)
+
 
 
 # ------------------ SECURE TUNNEL CHAT ------------------

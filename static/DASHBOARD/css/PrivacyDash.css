@@ -1,0 +1,137 @@
+:root {
+      --primary-color: #6c5ce7;
+      --danger-color: #ff7675;
+      --warning-color: #fdcb6e;
+      --success-color: #00b894;
+      --dark-color: #2d3436;
+    }
+    
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .privacy-card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      border-left: 4px solid transparent;
+      transition: all 0.3s;
+    }
+    
+    .privacy-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .privacy-card.security {
+      border-left-color: var(--danger-color);
+    }
+    
+    .privacy-card.access {
+      border-left-color: var(--primary-color);
+    }
+    
+    .privacy-card.logs {
+      border-left-color: var(--dark-color);
+    }
+    
+    .privacy-card.data {
+      border-left-color: var(--success-color);
+    }
+    
+    .privacy-icon {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--primary-color);
+    }
+    
+    .security-badge {
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: 10px;
+    }
+    
+    .badge-enabled {
+      background-color: #e3f9e5;
+      color: var(--success-color);
+    }
+    
+    .badge-disabled {
+      background-color: #ffe0e0;
+      color: var(--danger-color);
+    }
+    
+    .audit-log-item {
+      border-left: 3px solid #ddd;
+      padding-left: 15px;
+      margin-bottom: 15px;
+      transition: all 0.2s;
+    }
+    
+    .audit-log-item:hover {
+      border-left-color: var(--primary-color);
+      background-color: #f8f9fa;
+    }
+    
+    .log-critical {
+      border-left-color: var(--danger-color);
+    }
+    
+    .log-warning {
+      border-left-color: var(--warning-color);
+    }
+    
+    .log-info {
+      border-left-color: var(--primary-color);
+    }
+    
+    .privacy-table th {
+      background-color: #f1f1f1;
+      font-weight: 600;
+    }
+    
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+    
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+      background-color: var(--success-color);
+    }
+    
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }

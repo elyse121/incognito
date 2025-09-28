@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #f8d7da; color: #721c24; padding: 15px; text-align: center; }
+        .content { padding: 20px; background-color: #f9f9f9; }
+        .footer { margin-top: 20px; font-size: 0.9em; color: #6c757d; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Account Suspension Notice</h2>
+        </div>
+        <div class="content">
+            <p>Dear {{ user.username }},</p>
+            <p>We regret to inform you that your account has been suspended due to a violation of our community guidelines.</p>
+            <p><strong>Effective immediately:</strong></p>
+            <ul>
+                <li>You will no longer be able to access your account</li>
+                <li>All your content remains visible to other users</li>
+                <li>You cannot create new accounts</li>
+            </ul>
+            <p>If you believe this action was taken in error, you may appeal this decision by contacting us at <a href="mailto:{{ admin_email }}">{{ admin_email }}</a>.</p>
+        </div>
+        <div class="footer">
+            <p>This is an automated message. Please do not reply directly to this email.</p>
+        </div>
+    </div>
+</body>
+</html>

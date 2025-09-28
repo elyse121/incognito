@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You for Contacting Us</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .thank-you-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header-banner {
+            background: linear-gradient(90deg, #ff6b6b 0%, #ff8e8e 100%);
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .checkmark {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: -40px auto 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .checkmark i {
+            font-size: 40px;
+            color: #4CAF50;
+        }
+        .message-container {
+            padding: 30px;
+        }
+        .countdown {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #6c757d;
+        }
+        .social-links a {
+            transition: transform 0.3s;
+        }
+        .social-links a:hover {
+            transform: translateY(-3px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card thank-you-card">
+                    <div class="header-banner">
+                        <h1 class="text-white mb-0">Account Banned</h1>
+                    </div>
+                    
+                    <div class="checkmark">
+                        <i class="bi bi-check-circle-fill"></i>
+                    </div>
+                    
+                    <div class="message-container text-center">
+                        <h2 class="text-success mb-3">Thank You for Contacting Us!</h2>
+                        <p class="lead mb-4">We've received your message and our admin team will review your case shortly.</p>
+                        
+                        <div class="alert alert-info mb-4">
+                            <h5 class="alert-heading">You'll Get Feedback Very Soon</h5>
+                            <p class="mb-0">We appreciate your patience as we review your account status.</p>
+                        </div>
+                        
+                        <div class="countdown mb-4">
+                            <p>Expected response time: <span class="text-primary">24-48 hours</span></p>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <h5 class="mb-3">Follow us on social media for updates:</h5>
+                        <div class="social-links mb-4">
+                            <a href="#" class="btn btn-outline-primary me-2">
+                                <i class="bi bi-facebook me-2"></i>Facebook
+                            </a>
+                            <a href="#" class="btn btn-outline-info me-2">
+                                <i class="bi bi-twitter me-2"></i>Twitter
+                            </a>
+                            <a href="#" class="btn btn-outline-danger">
+                                <i class="bi bi-instagram me-2"></i>Instagram
+                            </a>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'banned_page' %}" class="btn btn-outline-secondary">Return to Homepage</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

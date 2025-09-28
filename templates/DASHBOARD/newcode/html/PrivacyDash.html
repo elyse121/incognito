@@ -1,0 +1,572 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Privacy & Security</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="{% static 'DASHBOARD/CSS/PrivacyDash.css' %}" rel="stylesheet">
+</head>
+<body>
+  <div class="container-fluid py-4">
+    <div class="row">
+      <div class="col-lg-10 mx-auto">
+        <!-- Header -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+          <div>
+            <h4 class="fw-bold mb-0"><i class="fas fa-lock me-2"></i>Privacy & Security</h4>
+            <p class="text-muted mb-0">Manage admin access, data protection, and security settings</p>
+          </div>
+          <div class="d-flex gap-2">
+            <div class="input-group" style="max-width: 300px;">
+              <input type="text" class="form-control" placeholder="Search settings...">
+              <button class="btn btn-primary"><i class="fas fa-search"></i></button>
+            </div>
+          </div>
+          <a href="{% url 'dashindex' %}" class="btn btn-outline-primary">
+              <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+        </a>
+        </div>
+        
+        <!-- Privacy Overview Cards -->
+        <div class="row g-4 mb-4">
+          <div class="col-md-6 col-lg-3">
+            <div class="privacy-card security h-100 p-4">
+              <div class="privacy-icon">
+                <i class="fas fa-shield-alt"></i>
+              </div>
+              <h5>Security Status</h5>
+              <div class="d-flex align-items-center mb-2">
+                <span class="security-badge badge-enabled me-2">Enabled</span>
+                <span>All protections active</span>
+              </div>
+              <p class="text-muted small">2-factor authentication required for all admins</p>
+            </div>
+          </div>
+          
+          <div class="col-md-6 col-lg-3">
+            <div class="privacy-card access h-100 p-4">
+              <div class="privacy-icon">
+                <i class="fas fa-user-lock"></i>
+              </div>
+              <h5>Admin Access</h5>
+              <div class="d-flex align-items-center mb-2">
+                <span class="security-badge badge-enabled me-2">Strict</span>
+                <span>{{ admin_count }} active admins</span>
+              </div>
+              <p class="text-muted small">Last login: {{ last_login_info }}</p>
+            </div>
+          </div>
+          
+          <div class="col-md-6 col-lg-3">
+            <div class="privacy-card logs h-100 p-4">
+              <div class="privacy-icon">
+                <i class="fas fa-clipboard-list"></i>
+              </div>
+              <h5>Audit Logs</h5>
+              <div class="d-flex align-items-center mb-2">
+                <span class="security-badge me-2" style="background-color: #e3f2fd; color: #1976d2;">
+                  {{ login_entries_today }} entries
+                </span>
+                <span>Today</span>
+              </div>
+              <p class="text-muted small">{{ critical_actions }} critical actions logged</p>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-lg-3">
+            <div class="privacy-card data h-100 p-4">
+              <div class="privacy-icon">
+                <i class="fas fa-database"></i>
+              </div>
+              <h5>Data Protection</h5>
+              <div class="d-flex align-items-center mb-2">
+                <span class="security-badge badge-enabled me-2">Encrypted</span>
+                <span>GDPR compliant</span>
+              </div>
+              <p class="text-muted small">Messages encrypted end-to-end</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="row">
+          <!-- Left Column - Security Settings -->
+          <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+              <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="fas fa-shield-alt me-2"></i>Security Settings</h5>
+              </div>
+              <div class="card-body">
+                <div class="mb-4">
+                  <h6>Authentication</h6>
+                  <div class="table-responsive">
+                    <table class="table privacy-table">
+                      <tbody>
+                        <tr>
+                          <td>2-Factor Authentication</td>
+                          <td>
+                            <label class="toggle-switch">
+                              <input type="checkbox" 
+                                    id="twoFactorToggle"
+                                    {% if admin_profile.two_factor_enabled %}checked{% endif %}>
+                              <span class="slider"></span>
+                            </label>
+                          </td>
+                          <td class="text-end">
+                            <button class="btn btn-sm btn-outline-primary" id="configure2FA">Configure</button>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Password Policy</td>
+                          <td>
+                            {% if password_strength == "strong" %}
+                              <span class="security-badge" style="background:#d4edda; color:#155724;">Strong</span>
+                            {% elif password_strength == "medium" %}
+                              <span class="security-badge" style="background:#fff3cd; color:#856404;">Medium</span>
+                            {% else %}
+                              <span class="security-badge" style="background:#f8d7da; color:#721c24;">Weak</span>
+                            {% endif %}
+                          </td>
+                          <td class="text-end">
+                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editPasswordModal">Edit</button>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Session Timeout</td>
+                          <td>{{ admin_profile.session_timeout }} minutes</td>
+                          <td class="text-end">
+                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#sessionTimeoutModal">Change</button>
+                          </td>
+                        </tr>
+                        <div class="modal fade" id="sessionTimeoutModal" tabindex="-1">
+                          <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                              <form method="post" action="{% url 'update_session_timeout' %}">
+                                {% csrf_token %}
+                                <div class="modal-header">
+                                  <h5 class="modal-title">Change Session Timeout</h5>
+                                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                  <label class="form-label">Session Timeout (minutes)</label>
+                                  <input type="number" name="session_timeout" class="form-control" value="{{ admin_profile.session_timeout }}">
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="submit" class="btn btn-primary">Update</button>
+                                </div>
+                              </form>
+                            </div>
+                          </div>
+                        </div>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <!----update credentails-->
+                <div class="modal fade" id="editPasswordModal" tabindex="-1">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                      <form method="post" action="{% url 'update_admin_credentials' %}">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                          <h5 class="modal-title">Edit Admin Credentials</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                          <div class="mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" name="username" class="form-control" value="{{ admin_user.username }}">
+                          </div>
+                          <div class="mb-3">
+                            <label class="form-label">New Password</label>
+                            <input type="password" name="password" class="form-control" placeholder="Leave blank to keep current">
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                <div class="mb-4">
+                  <h6>IP Restrictions</h6>
+                  <div class="table-responsive">
+                    <table class="table privacy-table">
+                      <tbody>
+                        <tr>
+                          <td>Allowed IP Ranges</td>
+                          <td>3 ranges</td>
+                          <td class="text-end">
+                            <button class="btn btn-sm btn-outline-primary">Manage</button>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>VPN Detection</td>
+                          <td>
+                            <label class="toggle-switch">
+                              <input type="checkbox">
+                              <span class="slider"></span>
+                            </label>
+                          </td>
+                          <td class="text-end">
+                            <button class="btn btn-sm btn-outline-secondary">Learn More</button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                
+                <div>
+                  <h6>Data Access</h6>
+                  <div class="table-responsive">
+                    <table class="table privacy-table">
+                      <tbody>
+                        <tr>
+                          <td>Message Content Access</td>
+                          <td>
+                            {% if privacy_settings.message_access == "full" %}
+                              <span class="security-badge badge-enabled">Full Access</span>
+                            {% else %}
+                              <span class="security-badge badge-disabled">Restricted</span>
+                            {% endif %}
+                          </td>
+                          <td class="text-end">
+                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#messageAccessModal">
+                              Permissions
+                            </button>
+                          </td>
+                        </tr>
+
+                        <div class="modal fade" id="messageAccessModal" tabindex="-1">
+                          <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                              <form method="post" action="{% url 'update_message_access' %}">
+                                {% csrf_token %}
+                                <div class="modal-header">
+                                  <h5 class="modal-title">Message Content Access</h5>
+                                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                  <select name="message_access" class="form-select">
+                                    <option value="restricted" {% if privacy_settings.message_access == "restricted" %}selected{% endif %}>Restricted</option>
+                                    <option value="full" {% if privacy_settings.message_access == "full" %}selected{% endif %}>Full Access</option>
+                                  </select>
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="submit" class="btn btn-primary">Save</button>
+                                </div>
+                              </form>
+                            </div>
+                          </div>
+                        </div>
+
+                        <tr>
+                          <td>User Data Export</td>
+                          <td>
+                            <label class="toggle-switch">
+                              <input type="checkbox" id="exportToggle" 
+                                    {% if privacy_settings.allow_export %}checked{% endif %}>
+                              <span class="slider"></span>
+                            </label>
+                          </td>
+                          <td class="text-end">
+                            <button class="btn btn-sm btn-outline-primary">Settings</button>
+                          </td>
+                        </tr>
+                        <script>
+                        document.getElementById("exportToggle").addEventListener("change", function() {
+                          fetch("{% url 'toggle_export_permission' %}", {
+                            method: "POST",
+                            headers: {
+                              "X-CSRFToken": "{{ csrf_token }}",
+                              "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({ allow_export: this.checked })
+                          });
+                        });
+                        </script> 
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Right Column - Access Control & Logs -->
+          <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+              <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-users-cog me-2"></i>Admin Access Control</h5>
+                <!-- Add Admin Button triggers form -->
+<button class="btn btn-sm btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#addAdminForm">
+  <i class="fas fa-plus me-1"></i> Add Admin
+</button>
+
+<!-- Collapsible Add Admin Form -->
+<div class="collapse mt-3" id="addAdminForm">
+  <div class="card card-body">
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="add_admin" value="1">
+
+      <div class="mb-3">
+        <label>Username</label>
+        <input type="text" name="username" class="form-control" placeholder="Enter username" required>
+      </div>
+
+      <div class="mb-3">
+        <label>Role</label>
+        <select name="role" class="form-select" required>
+          <option value="" disabled selected>Select Role</option>
+          <option value="Admin">Admin</option>
+          <option value="Moderator">Moderator</option>
+          <option value="Member">Member</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label>Status</label>
+        <select name="status" class="form-select" required>
+          <option value="" disabled selected>Select Status</option>
+          <option value="True">Active</option>
+          <option value="False">Inactive</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+  </div>
+</div>
+
+
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table privacy-table">
+                      <thead>
+                        <tr>
+                          <th>Admin</th>
+                          <th>Role</th>
+                          <th>Last Active</th>
+                          <th>Status</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for admin in admins_list %}
+                        <tr>
+                          <td>
+                            <div class="d-flex align-items-center gap-2">
+                              <img src="{{ admin.profile_url }}" width="30" height="30" class="rounded-circle">
+                              <span>{{ admin.name }}</span>
+                            </div>
+                          </td>
+                          <td>{{ admin.role }}</td>
+                          <td>{{ admin.last_active }}</td>
+                          <td>
+                            {% if admin.status == "Active" %}
+                              <span class="security-badge badge-enabled">Active</span>
+                            {% else %}
+                              <span class="security-badge badge-disabled">{{ admin.status }}</span>
+                            {% endif %}
+                          </td>
+                          <!-- Edit Button -->
+                          <td class="text-end">
+                            <button class="btn btn-sm btn-outline-secondary edit-btn" 
+                                    data-id="{{ admin.id }}"
+                                    data-name="{{ admin.name }}"
+                                    data-role="{{ admin.role }}"
+                                    data-status="{{ admin.status }}"
+                                    data-bs-toggle="modal" data-bs-target="#editAdminModal">
+                              Edit
+                            </button>
+                          </td>
+
+                          <!-- Edit Admin Modal -->
+                          <div class="modal fade" id="editAdminModal" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog">
+                              <div class="modal-content">
+                                <form method="post" id="editAdminForm">
+                                  {% csrf_token %}
+                                  <input type="hidden" name="admin_id" id="edit-admin-id">
+
+                                  <div class="modal-header">
+                                    <h5 class="modal-title">Edit Admin</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                  </div>
+
+                                  <div class="modal-body">
+                                    <div class="mb-3">
+                                      <label for="edit-name" class="form-label">Name</label>
+                                      <input type="text" class="form-control" id="edit-name" name="name" required>
+                                    </div>
+                                    <div class="mb-3">
+                                      <label for="edit-role" class="form-label">Role</label>
+                                      <select class="form-select" id="edit-role" name="role" required>
+                                        <option value="Admin">Admin</option>
+                                        <option value="Moderator">Moderator</option>
+                                        <option value="Member">Member</option>
+                                      </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                      <label for="edit-status" class="form-label">Status</label>
+                                      <select class="form-select" id="edit-status" name="status" required>
+                                        <option value="" disabled selected>Select Status</option>              
+                                        <option value="True">Active</option>
+                                        <option value="False">Inactive</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                  <div class="modal-footer">
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                  </div>
+                                </form>
+                              </div>
+                            </div>
+                          </div>
+
+                          <script>
+                            document.querySelectorAll('.edit-btn').forEach(button => {
+                            button.addEventListener('click', function() {
+                              const adminId = this.dataset.id;
+                              const name = this.dataset.name;
+                              const role = this.dataset.role;
+                              const status = this.dataset.status;
+
+                              document.getElementById('edit-admin-id').value = adminId;
+                              document.getElementById('edit-name').value = name;
+                              document.getElementById('edit-status').value = status;
+
+                              // Set the role dropdown to the current role
+                              const roleSelect = document.getElementById('edit-role');
+                              roleSelect.value = role;
+                            });
+                          });
+                          </script>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                  </table>
+                </div>
+                <hr class="my-4">
+                
+                <h5 class="mb-3"><i class="fas fa-clipboard-list me-2"></i>Recent Security Events</h5>
+                <div class="audit-log">
+                  <div class="audit-log-item log-critical">
+                    <div class="d-flex justify-content-between">
+                      <strong>Failed login attempt</strong>
+                      <small class="text-muted">2 mins ago</small>
+                    </div>
+                    <p class="mb-1">IP: 192.168.1.100 | Location: Unknown</p>
+                    <small class="text-danger"><i class="fas fa-exclamation-triangle me-1"></i>3 failed attempts</small>
+                  </div>
+                  
+                  <div class="audit-log-item log-info">
+                    <div class="d-flex justify-content-between">
+                      <strong>Permissions updated</strong>
+                      <small class="text-muted">1 hour ago</small>
+                    </div>
+                    <p class="mb-1">Admin: Jane Smith | Changed role permissions</p>
+                    <small class="text-muted"><i class="fas fa-info-circle me-1"></i>Modified message deletion rights</small>
+                  </div>
+                  
+                  <div class="audit-log-item log-warning">
+                    <div class="d-flex justify-content-between">
+                      <strong>Data export</strong>
+                      <small class="text-muted">3 hours ago</small>
+                    </div>
+                    <p class="mb-1">Admin: Alex Johnson | Exported user reports</p>
+                    <small class="text-warning"><i class="fas fa-exclamation-circle me-1"></i>Large dataset exported</small>
+                  </div>
+                </div>
+                
+                <div class="text-end mt-3">
+                  <button class="btn btn-sm btn-outline-primary">View All Logs</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Data Protection Section -->
+        <div class="card mb-4">
+          <div class="card-header bg-white">
+            <h5 class="mb-0"><i class="fas fa-database me-2"></i>Data Protection Settings</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-4">
+                  <h6>Data Retention</h6>
+                  <div class="table-responsive">
+                    <table class="table privacy-table">
+                      <tbody>
+                        <tr>
+                          <td>Message Retention</td>
+                          <td>90 days</td>
+                          <td class="text-end">
+                            <button class="btn btn-sm btn-outline-primary">Configure</button>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Admin Log Retention</td>
+                          <td>1 year</td>
+                          <td class="text-end">
+                            <button class="btn btn-sm btn-outline-primary">Change</button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-4">
+                  <h6>Privacy Compliance</h6>
+                  <div class="table-responsive">
+                    <table class="table privacy-table">
+                      <tbody>
+                        <tr>
+                          <td>GDPR Compliance</td>
+                          <td><span class="security-badge badge-enabled">Enabled</span></td>
+                          <td class="text-end">
+                            <button class="btn btn-sm btn-outline-primary">Settings</button>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>CCPA Compliance</td>
+                          <td><span class="security-badge badge-enabled">Enabled</span></td>
+                          <td class="text-end">
+                            <button class="btn btn-sm btn-outline-primary">Settings</button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="alert alert-warning">
+              <i class="fas fa-exclamation-triangle me-2"></i>
+              <strong>Warning:</strong> Changing data retention settings may affect compliance with privacy regulations.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

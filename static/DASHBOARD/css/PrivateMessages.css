@@ -1,0 +1,94 @@
+    :root {
+      --primary-color: #6c5ce7;
+      --danger-color: #ff7675;
+      --warning-color: #fdcb6e;
+    }
+    
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .user-table {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    
+    .badge-banned {
+      background: var(--danger-color);
+    }
+    
+    .action-btn {
+      opacity: 0.8;
+      transition: all 0.2s;
+    }
+    
+    .action-btn:hover {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+    
+    .dropdown-toggle::after {
+      display: none;
+    }
+    
+    /* Chat bubbles */
+    .chat-bubble {
+      max-width: 70%;
+      padding: 10px 15px;
+      border-radius: 18px;
+      margin-bottom: 10px;
+      position: relative;
+    }
+    
+    .chat-bubble.sender {
+      background: #e3f2fd;
+      margin-right: auto;
+    }
+    
+    .chat-bubble.receiver {
+      background: #f1f1f1;
+      margin-left: auto;
+    }
+    
+    .message-actions {
+      position: absolute;
+      right: -25px;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    
+    .chat-bubble:hover .message-actions {
+      opacity: 1;
+    }
+    
+    .partner-card {
+      transition: all 0.2s;
+      border-left: 3px solid transparent;
+    }
+    
+    .partner-card:hover {
+      background-color: #f8f9fa;
+      border-left-color: var(--primary-color);
+    }
+    
+    .partner-card.reported {
+      border-left-color: var(--danger-color);
+      background-color: #fff9f9;
+    }
+    
+    .no-results {
+      text-align: center;
+      padding: 40px;
+      color: #6c757d;
+    }

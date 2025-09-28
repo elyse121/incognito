@@ -4,405 +4,648 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Posts Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posts | cypherLink</title>
     <link rel="icon" type="image/x-icon" href="{% static 'images/bbbm.ico' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
-
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #000; /* Dark mode */
-            color: #fff;
+        :root {
+            --primary-bg: #0a0a0a;
+            --secondary-bg: #1a1a1a;
+            --tertiary-bg: #2a2a2a;
+            --accent-color: #4a9eff;
+            --danger-color: #ff3333;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --border-color: #333333;
+            --success-color: #00cc66;
+            --card-radius: 16px;
+            --element-radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
-    
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles */
         .navbar {
-            background-color: #000;
-            color: #fff;
-            padding: 15px 20px;
+            background-color: var(--secondary-bg);
+            padding: 1rem 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #222;
+            border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
             z-index: 100;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
-    
-        .navbar .title {
-            font-size: 24px;
-            font-weight: bold;
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-    
-        .navbar a {
-            color: #fff;
-            margin-left: 15px;
-            text-decoration: none;
-            font-size: 16px;
+
+        .nav-brand i {
+            color: var(--accent-color);
+            font-size: 1.5rem;
         }
-    
-        .navbar a:hover {
-            text-decoration: underline;
+
+        .nav-brand span {
+            font-weight: 700;
+            font-size: 1.3rem;
+            background: linear-gradient(90deg, var(--accent-color), #8bc6ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-    
-        .post-box {
-            background-color: #111;
-            border: 1px solid #222;
-            border-radius: 20px; /* Keeps the box rounded */
-            padding: 15px 20px;
-            margin-bottom: 20px;
-            overflow: hidden; /* Ensures any overflow is hidden, maintaining the curve */
-            width: 100%; /* Full width of post box */
-            box-sizing: border-box; /* Include padding and border in width */
-        }
-    
-        .post-box h3 {
-            margin-top: 0;
-            font-size: 18px;
-            color: #fff;
-        }
-    
-        .post-box p {
-            color: #ccc;
-            line-height: 1.5;
-        }
-    
-        .post-box img {
-            width: 100%; /* Makes image take full width of container */
-            height: auto; /* Maintain aspect ratio */
-            object-fit: cover; /* Ensures image fits without distortion */
-            border-radius: 20px; /* Match the box's border-radius for consistent rounding */
-        }
-    
-        .post-actions {
+
+        .nav-links {
             display: flex;
             align-items: center;
             gap: 15px;
-            margin-top: 10px;
         }
-    
-        .post-actions button {
-            background: none;
-            border: none;
-            color: #aaa;
-            cursor: pointer;
-            font-size: 14px;
-        }
-    
-        .post-actions button:hover {
-            color: #fff;
-        }
-    
-        .profile-info {
+
+        .nav-btn {
+            color: var(--text-primary);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: var(--element-radius);
+            font-weight: 500;
+            transition: var(--transition);
             display: flex;
             align-items: center;
-            margin-bottom: 10px;
+            gap: 6px;
         }
-    
-        .profile-pic {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 10px;
-            border: 1px solid #444;
+
+        .nav-btn.chat-btn {
+            background-color: var(--accent-color);
         }
-    
-        textarea {
-            width: 100%;
-            border: none;
-            border-radius: 8px;
-            padding: 10px;
-            resize: none;
-            background-color: #222;
-            color: #fff;
-            margin-top: 10px;
+
+        .nav-btn.add-btn {
+            background-color: var(--success-color);
         }
-    
-        .comment-section {
-            margin-top: 15px;
-            border-top: 1px solid #222;
-            padding-top: 10px;
+
+        .nav-btn.logout-btn {
+            background-color: var(--danger-color);
         }
-    
-        .comment-section p {
-            font-size: 14px;
-            margin-bottom: 8px;
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
-    
-        .footer {
-            text-align: center;
-            padding: 15px;
-            background-color: #000;
-            font-size: 14px;
-            color: #555;
-            border-top: 1px solid #222;
-            margin-top: 40px;
-        }
-    
-        .content {
-            padding: 20px;
-            max-width: 700px; /* Default width for desktop */
-            margin: 0 auto; /* Center alignment */
-            box-sizing: border-box;
-            /* Use full width on mobile - adjust with JavaScript if needed */
-        }
-    
-        /* Media Query for Mobile Devices */
-        @media (max-width: 750px) {
-            .post-box {
-                padding: 10px;  /* Reduce padding in the post box for mobile */
-                margin-bottom: 15px;  /* Ensure posts don't overlap */
-            }
-    
-            .post-box img {
-                width: 100%;    /* Ensure image fills the container */
-                height: auto;   /* Maintain aspect ratio */
-                object-fit: cover; /* Prevent distortion */
-            }
-        }
-    
-        /* Adjust for even smaller screens like on mobile phones */
-        @media (max-width: 480px) {
-            .navbar .title {
-                font-size: 20px;
-            }
-    
-            .navbar a {
-                font-size: 14px;
-            }
-    
-            .post-box {
-                padding: 8px;  /* Further reduce padding on very small screens */
-            }
-    
-            .post-actions button {
-                font-size: 12px; /* Adjust button size for small screens */
-            }
-    
-            .footer {
-                font-size: 12px;  /* Smaller footer text */
-            }
-        }
-    </style>
-    
-</head>
-<body>
-    <div class="navbar" style="
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    background-color: #232829; 
-    padding: 15px 20px; 
-    border-bottom: 1px solid #f7f8f9;">
-    
-    <div class="title">
-        <!-- CHANGE LINK TO RE-CONNECT TO CHAT.HTML-->
-        <a href="{% url 'go-to-user5-chat' %}" style="
-            color: white; 
-            text-decoration: none; 
-            font-size: 18px; 
-            font-weight: bold; 
-            padding: 10px 15px;
-            border-radius: 8px;
-            transition: background 0.3s;">
-            Go to Chats
-        </a>
-    </div>
-    <div class="title">
-        <a href="{% url 'go-to-souls' %}" class="tunnel-btn" id="tunnelBtn" style="
-            color: white; 
-            text-decoration: none; 
-            font-size: 18px; 
-            font-weight: bold; 
-            padding: 10px 15px;
-            border-radius: 8px;
-            transition: all 0.3s;
-            background: #1a1a1a;
-            border: 1px solid #ff3333;
-            display: inline-flex;
+
+        .tunnel-btn {
+            position: relative;
+            overflow: hidden;
+            background: var(--tertiary-bg);
+            border: 1px solid var(--danger-color);
+            padding: 8px 16px;
+            border-radius: var(--element-radius);
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
             align-items: center;
             gap: 8px;
-            position: relative;
-            overflow: hidden;">
-          <i class="fas fa-radiation-alt" style="color: #ff3333;"></i>
-          <span>TUNNEL</span>
-          <span class="tunnel-pulse" style="
-              position: absolute;
-              top: 0;
-              left: 0;
-              width: 100%;
-              height: 100%;
-              border-radius: 6px;
-              background: transparent;
-              box-shadow: 0 0 0 0 rgba(255, 51, 51, 0.7);
-              animation: tunnelPulse 2s infinite;
-              z-index: -1;">
-          </span>
-        </a>
-      </div>
-      
-      <style>
-        @keyframes tunnelPulse {
-          0% {
-            box-shadow: 0 0 0 0 rgba(255, 51, 51, 0.7);
-          }
-          70% {
-            box-shadow: 0 0 0 10px rgba(255, 51, 51, 0);
-          }
-          100% {
-            box-shadow: 0 0 0 0 rgba(255, 51, 51, 0);
-          }
+            transition: var(--transition);
         }
-      
+
         .tunnel-btn:hover {
-          background: #2a2a2a;
-          box-shadow: 0 0 10px rgba(255, 51, 51, 0.5);
-          transform: translateY(-2px);
+            background: #2a2a2a;
+            box-shadow: 0 0 15px rgba(255, 51, 51, 0.4);
         }
-      
-        .tunnel-btn:active {
-          transform: translateY(1px);
+
+        .tunnel-pulse {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: var(--element-radius);
+            animation: tunnelPulse 2s infinite;
+            z-index: -1;
         }
-      </style>
-      
-      <script>
-        document.getElementById('tunnelBtn').addEventListener('click', function(e) {
-          e.preventDefault();
-          
-          // Create danger flash effect
-          const flash = document.createElement('div');
-          flash.style.position = 'fixed';
-          flash.style.top = '0';
-          flash.style.left = '0';
-          flash.style.width = '100%';
-          flash.style.height = '100%';
-          flash.style.backgroundColor = 'rgba(255, 0, 0, 0.3)';
-          flash.style.zIndex = '9998';
-          flash.style.animation = 'fadeOut 0.5s forwards';
-          document.body.appendChild(flash);
-          
-          // Add skull icon during flash
-          const warning = document.createElement('div');
-          warning.innerHTML = '<i class="fas fa-skull" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); font-size:5rem; color:#ff3333; z-index:9999;"></i>';
-          document.body.appendChild(warning);
-          
-          // Remove effects after animation
-          setTimeout(() => {
-            flash.remove();
-            warning.remove();
-            window.location.href = "{% url 'go-to-souls' %}";
-          }, 500);
-          
-          // Add animation style
-          const style = document.createElement('style');
-          style.innerHTML = `
-            @keyframes fadeOut {
-              0% { opacity: 1; }
-              100% { opacity: 0; }
+
+        @keyframes tunnelPulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 51, 51, 0.7);
             }
-          `;
-          document.head.appendChild(style);
-        });
-      </script>
-    <div style="color: white; font-size: 16px; font-weight: bold;">
-        Welcome, {{ user.username }}
-    </div>
-    <div>
-        <a href="/posts/new" style="
-            color: white; 
-            text-decoration: none; 
-            font-size: 16px; 
-            margin-right: 15px;
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 51, 51, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 51, 51, 0);
+            }
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 700px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            flex: 1;
+        }
+
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--secondary-bg), var(--tertiary-bg));
+            border-radius: var(--card-radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .welcome-banner i {
+            font-size: 2rem;
+            color: var(--accent-color);
+        }
+
+        .welcome-text h2 {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+
+        .welcome-text p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Post Styles */
+        .post-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .post-card {
+            background-color: var(--secondary-bg);
+            border-radius: var(--card-radius);
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            transition: var(--transition);
+        }
+
+        .post-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 12px;
+            border: 2px solid var(--accent-color);
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .username {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .post-time {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .post-content {
+            padding: 1.5rem;
+        }
+
+        .post-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .post-text {
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .post-image {
+            width: 100%;
+            border-radius: 10px;
+            margin-top: 10px;
+            max-height: 400px;
+            object-fit: cover;
+        }
+
+        .post-actions {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            gap: 20px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+
+        .action-btn:hover {
+            background-color: var(--tertiary-bg);
+            color: var(--text-primary);
+        }
+
+        .action-btn.liked {
+            color: var(--danger-color);
+        }
+
+        .action-btn.liked:hover {
+            background-color: rgba(255, 51, 51, 0.1);
+        }
+
+        .comment-section {
+            padding: 0 1.5rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 10px;
+        }
+
+        .comments-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .comment {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .comment:last-child {
+            border-bottom: none;
+        }
+
+        .comment-user {
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .comment-text {
+            color: var(--text-secondary);
+        }
+
+        .comment-form {
+            display: flex;
+            gap: 10px;
+        }
+
+        .comment-input {
+            flex: 1;
+            background-color: var(--tertiary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
             padding: 10px 15px;
-            border-radius: 8px;
-            background-color: #435f7a;
-            transition: background 0.3s;">
-            Add Post
-        </a>
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            resize: none;
+            height: 40px;
+            transition: var(--transition);
+        }
 
-        <a href="{% url 'logout' %}" style="
-            color: white; 
-            text-decoration: none; 
-            font-size: 16px; 
-            padding: 10px 15px;
-            border-radius: 8px;
-            background-color: #d9534f;
-            transition: background 0.3s;">
-            Logout
-        </a>
-    </div>
- </div>
+        .comment-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
 
-    
+        .comment-submit {
+            background-color: var(--accent-color);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            padding: 0 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+        }
 
-    <div class="content">
-        {% for post in posts %}
-        <div class="post-box">
-            <!-- User Info -->
-            <!-- User Info -->
-        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-    {% if post.author.userprofile.profile_picture %}
-        <img src="{{ post.author.userprofile.profile_picture.url }}" alt="Profile Pic" style="width: 40px; height: 40px; border-radius: 50%;">
-    {% else %}
-        <img src="{% static 'default-avatar.png' %}" alt="Default Avatar" style="width: 40px; height: 40px; border-radius: 50%;">
-    {% endif %}
-    <strong style="color: #fff;">{{ post.author.username }}</strong>
-      </div>
+        .comment-submit:hover {
+            background-color: #3a8ae6;
+            transform: scale(1.05);
+        }
 
-        
-            <!-- Post Content -->
-            <h3>{{ post.title }}</h3>
-            <p>{{ post.content }}</p>
-            {% if post.photo %}
-                <img src="{{ post.photo.url }}" alt="Post Photo">
-            {% endif %}
-        
-            <!-- Like Button -->
-            <div class="post-actions">
-                <button class="like-btn" data-post-id="{{ post.id }}">
-                    <i class="{% if post.id in user_liked_post_ids %}fa-solid{% else %}fa-regular{% endif %} fa-heart" id="heart-icon-{{ post.id }}"></i>
-                    <span class="like-count" id="like-count-{{ post.id }}">{{ post.likes.count }}</span>
-                </button>
-            </div>
-        
-            <!-- Comment Section -->
-            <div class="comment-section">
-                <h4 style="color:#fff; font-size: 16px;">Comments</h4>
-                {% for comment in post.comments.all %}
-                    <p><strong>{{ comment.user.username }}</strong> {{ comment.content }}</p>
-                {% empty %}
-                    <p>No comments yet.</p>
-                {% endfor %}
-        
-                <form method="POST" action="{% url 'comment_post' post.id %}">
-                    {% csrf_token %}
-                    <textarea name="comment" placeholder="Write a comment..." required></textarea>
-                    <button type="submit" style="margin-top: 5px; background: #555; border: none; padding: 6px 12px; border-radius: 6px; color: white; cursor: pointer;">Post</button>
-                </form>
-            </div>
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            background-color: var(--secondary-bg);
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .nav-links {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                margin-top: 10px;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .welcome-banner {
+                flex-direction: column;
+                text-align: center;
+                padding: 1rem;
+            }
+            
+            .post-header {
+                padding: 1rem;
+            }
+            
+            .post-content {
+                padding: 1rem;
+            }
+            
+            .post-actions {
+                padding: 0.8rem 1rem;
+            }
+            
+            .comment-section {
+                padding: 0 1rem 1rem;
+            }
+            
+            .nav-btn span.text {
+                display: none;
+            }
+            
+            .nav-btn {
+                padding: 10px 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-links {
+                order: unset;
+                width: auto;
+                margin-top: 0;
+            }
+            
+            .post-actions {
+                justify-content: space-between;
+                gap: 10px;
+            }
+            
+            .action-btn span {
+                display: none;
+            }
+            
+            .action-btn {
+                padding: 8px;
+            }
+            
+            .comment-form {
+                flex-direction: column;
+            }
+            
+            .comment-submit {
+                align-self: flex-end;
+                width: 100px;
+            }
+        }
+
+        /* Animation for new posts */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .post-card {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--secondary-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--tertiary-bg);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <header class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-comments"></i>
+            <span>cypherLink</span>
         </div>
         
-        {% empty %}
-            <p>No posts to show.</p>
-        {% endfor %}
-    </div>
+        <div class="nav-links">
+            <a href="{% url 'go-to-user5-chat' %}" class="nav-btn chat-btn">
+                <i class="fas fa-comment-dots"></i>
+                <span class="text">Chats</span>
+            </a>
+            
+            <a href="/posts/new" class="nav-btn add-btn">
+                <i class="fas fa-plus"></i>
+                <span class="text">Add Post</span>
+            </a>
+            
+            <a href="{% url 'go-to-souls' %}" class="tunnel-btn" id="tunnelBtn">
+                <i class="fas fa-radiation-alt"></i>
+                <span class="text">TUNNEL</span>
+                <span class="tunnel-pulse"></span>
+            </a>
+            
+            <a href="{% url 'logout' %}" class="nav-btn logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="text">Logout</span>
+            </a>
+        </div>
+    </header>
 
-    <div class="footer">
-        &copy; 2025 Chatter App
-    </div>
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+            <i class="fas fa-user-circle"></i>
+            <div class="welcome-text">
+                <h2>Welcome back, {{ user.username }}!</h2>
+                <p>Share your thoughts with the community</p>
+            </div>
+        </div>
+
+        <!-- Posts Feed -->
+        <div class="post-feed">
+            {% for post in posts %}
+            <article class="post-card">
+                <!-- Post Header -->
+                <div class="post-header">
+                    {% if post.author.userprofile.profile_picture %}
+                        <img src="{{ post.author.userprofile.profile_picture.url }}" alt="Profile" class="user-avatar">
+                    {% else %}
+                        <img src="{% static 'default-avatar.png' %}" alt="Default Avatar" class="user-avatar">
+                    {% endif %}
+                    <div class="user-info">
+                        <div class="username">{{ post.author.username }}</div>
+                        <div class="post-time">{{ post.created_at|timesince }} ago</div>
+                    </div>
+                </div>
+
+                <!-- Post Content -->
+                <div class="post-content">
+                    <h3 class="post-title">{{ post.title }}</h3>
+                    <p class="post-text">{{ post.content }}</p>
+                    {% if post.photo %}
+                        <img src="{{ post.photo.url }}" alt="Post Image" class="post-image">
+                    {% endif %}
+                </div>
+
+                <!-- Post Actions -->
+                <div class="post-actions">
+                    <button class="action-btn like-btn {% if post.id in user_liked_post_ids %}liked{% endif %}" data-post-id="{{ post.id }}">
+                        <i class="{% if post.id in user_liked_post_ids %}fas{% else %}far{% endif %} fa-heart" id="heart-icon-{{ post.id }}"></i>
+                        <span id="like-count-{{ post.id }}">{{ post.likes.count }}</span>
+                    </button>
+                    
+                    <button class="action-btn comment-toggle">
+                        <i class="far fa-comment"></i>
+                        <span>{{ post.comments.count }}</span>
+                    </button>
+                    
+                    <button class="action-btn share-btn">
+                        <i class="far fa-share-square"></i>
+                        <span>Share</span>
+                    </button>
+                </div>
+
+                <!-- Comments Section -->
+                <div class="comment-section" style="display: none;">
+                    <div class="comments-list">
+                        {% for comment in post.comments.all %}
+                            <div class="comment">
+                                <span class="comment-user">{{ comment.user.username }}</span>
+                                <span class="comment-text">{{ comment.content }}</span>
+                            </div>
+                        {% empty %}
+                            <p style="color: var(--text-secondary); text-align: center; padding: 10px;">No comments yet</p>
+                        {% endfor %}
+                    </div>
+                    
+                    <form method="POST" action="{% url 'comment_post' post.id %}" class="comment-form">
+                        {% csrf_token %}
+                        <textarea name="comment" placeholder="Write a comment..." class="comment-input" required></textarea>
+                        <button type="submit" class="comment-submit">Post</button>
+                    </form>
+                </div>
+            </article>
+            {% empty %}
+            <div class="empty-state">
+                <i class="far fa-newspaper"></i>
+                <h3>No posts yet</h3>
+                <p>Be the first to share something with the community!</p>
+                <a href="/posts/new" class="nav-btn add-btn" style="margin-top: 15px; display: inline-block;">
+                    <i class="fas fa-plus"></i>
+                    Create Post
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 cypherLink App. Connecting people through conversations.</p>
+    </footer>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Like functionality
             const likeButtons = document.querySelectorAll('.like-btn');
-        
+            
             likeButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     const postId = this.getAttribute('data-post-id');
                     const likeCountSpan = document.getElementById(`like-count-${postId}`);
                     const heartIcon = document.getElementById(`heart-icon-${postId}`);
-        
+                    
                     fetch(`/like/${postId}/`, {
                         method: 'POST',
                         headers: {
@@ -411,23 +654,103 @@
                         }
                     }).then(response => response.json())
                       .then(data => {
-                          // Update count
                           likeCountSpan.textContent = data.like_count;
-        
-                          // Toggle heart icon
+                          
                           if (data.liked) {
-                              heartIcon.classList.remove('fa-regular');
-                              heartIcon.classList.add('fa-solid');
+                              heartIcon.classList.remove('far');
+                              heartIcon.classList.add('fas');
+                              button.classList.add('liked');
                           } else {
-                              heartIcon.classList.remove('fa-solid');
-                              heartIcon.classList.add('fa-regular');
+                              heartIcon.classList.remove('fas');
+                              heartIcon.classList.add('far');
+                              button.classList.remove('liked');
                           }
+                          
+                          // Add a quick animation feedback
+                          button.style.transform = 'scale(1.2)';
+                          setTimeout(() => {
+                              button.style.transform = 'scale(1)';
+                          }, 200);
                       });
                 });
             });
+            
+            // Comment toggle functionality
+            const commentToggles = document.querySelectorAll('.comment-toggle');
+            
+            commentToggles.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const commentSection = this.closest('.post-card').querySelector('.comment-section');
+                    const isVisible = commentSection.style.display === 'block';
+                    
+                    // Close all other comment sections
+                    document.querySelectorAll('.comment-section').forEach(section => {
+                        section.style.display = 'none';
+                    });
+                    
+                    // Toggle current section
+                    commentSection.style.display = isVisible ? 'none' : 'block';
+                    
+                    // Scroll to comments if opening
+                    if (!isVisible) {
+                        commentSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                });
+            });
+            
+            // Tunnel button animation
+            const tunnelBtn = document.getElementById('tunnelBtn');
+            if (tunnelBtn) {
+                tunnelBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Create danger flash effect
+                    const flash = document.createElement('div');
+                    flash.style.position = 'fixed';
+                    flash.style.top = '0';
+                    flash.style.left = '0';
+                    flash.style.width = '100%';
+                    flash.style.height = '100%';
+                    flash.style.backgroundColor = 'rgba(255, 0, 0, 0.3)';
+                    flash.style.zIndex = '9998';
+                    flash.style.animation = 'fadeOut 0.5s forwards';
+                    document.body.appendChild(flash);
+                    
+                    // Add skull icon during flash
+                    const warning = document.createElement('div');
+                    warning.innerHTML = '<i class="fas fa-skull" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); font-size:5rem; color:#ff3333; z-index:9999;"></i>';
+                    document.body.appendChild(warning);
+                    
+                    // Add animation style
+                    const style = document.createElement('style');
+                    style.innerHTML = `
+                        @keyframes fadeOut {
+                            0% { opacity: 1; }
+                            100% { opacity: 0; }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                    
+                    // Remove effects after animation and redirect
+                    setTimeout(() => {
+                        flash.remove();
+                        warning.remove();
+                        style.remove();
+                        window.location.href = "{% url 'go-to-souls' %}";
+                    }, 500);
+                });
+            }
+            
+            // Share button functionality
+            const shareButtons = document.querySelectorAll('.share-btn');
+            
+            shareButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // In a real app, this would use the Web Share API
+                    alert('Share functionality would open here!');
+                });
+            });
         });
-        </script>
-
-        
+    </script>
 </body>
 </html>

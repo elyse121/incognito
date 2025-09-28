@@ -1,0 +1,765 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Manage Posts</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #4e73df;
+      --secondary-color: #6f42c1;
+      --success-color: #1cc88a;
+      --danger-color: #e74a3b;
+      --warning-color: #f6c23e;
+      --info-color: #36b9cc;
+      --light-bg: #f8f9fc;
+      --dark-text: #5a5c69;
+    }
+    
+    body {
+      background-color: #f8f9fc;
+      padding: 20px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .container-fluid {
+      max-width: 1800px;
+    }
+    
+    .card {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    }
+    
+    .card-header {
+      background-color: #fff;
+      border-bottom: 1px solid #e3e6f0;
+      padding: 1rem 1.35rem;
+    }
+    
+    .table th {
+      border-top: none;
+      font-weight: 700;
+      color: var(--dark-text);
+      padding: 0.75rem 1rem;
+    }
+    
+    .table td {
+      padding: 0.75rem 1rem;
+      vertical-align: middle;
+    }
+    
+    .badge {
+      font-weight: 500;
+      padding: 0.35em 0.5em;
+    }
+    
+    .btn-sm {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+    }
+    
+    /* Post Detail Modal Styles */
+    .modal-content {
+      border: none;
+      border-radius: 0.5rem;
+      box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .modal-header {
+      background-color: var(--primary-color);
+      color: white;
+      border-bottom: none;
+      padding: 1rem 1.5rem;
+      border-radius: 0.5rem 0.5rem 0 0;
+    }
+    
+    .modal-header .btn-close {
+      filter: invert(1);
+    }
+    
+    .modal-tabs {
+      border-bottom: 1px solid #e3e6f0;
+      padding: 0 1.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .modal-tabs .nav-link {
+      color: var(--dark-text);
+      font-weight: 600;
+      padding: 0.75rem 1rem;
+      border: none;
+      border-bottom: 3px solid transparent;
+    }
+    
+    .modal-tabs .nav-link.active {
+      color: var(--primary-color);
+      background: transparent;
+      border-bottom: 3px solid var(--primary-color);
+    }
+    
+    .modal-body {
+      padding: 1.5rem;
+    }
+    
+    .modal-footer {
+      border-top: 1px solid #e3e6f0;
+      padding: 1rem 1.5rem;
+    }
+    
+    .post-content {
+      line-height: 1.6;
+      color: #4a4a4a;
+    }
+    
+    .post-meta {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .post-author-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 0.75rem;
+    }
+    
+    .post-author-info h6 {
+      margin-bottom: 0.25rem;
+      font-weight: 600;
+    }
+    
+    .post-author-info .text-muted {
+      font-size: 0.85rem;
+    }
+    
+    .post-stats {
+      display: flex;
+      gap: 1rem;
+      margin: 1rem 0;
+      padding: 0.75rem;
+      background-color: var(--light-bg);
+      border-radius: 0.35rem;
+    }
+    
+    .post-stat {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      color: var(--dark-text);
+    }
+    
+    .post-media {
+      margin: 1rem 0;
+    }
+    
+    .post-media img {
+      max-width: 100%;
+      border-radius: 0.35rem;
+      box-shadow: 0 0.15rem 0.5rem rgba(0, 0, 0, 0.1);
+    }
+    
+    .comment {
+      padding: 1rem;
+      border-radius: 0.35rem;
+      margin-bottom: 1rem;
+      background-color: var(--light-bg);
+      border-left: 3px solid var(--primary-color);
+    }
+    
+    .comment-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+    
+    .comment-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 0.75rem;
+    }
+    
+    .comment-author {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+    
+    .comment-date {
+      font-size: 0.75rem;
+      color: #858796;
+    }
+    
+    .comment-content {
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    
+    .loading-spinner {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 150px;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .hover-shadow:hover {
+      box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+      transition: all 0.3s ease;
+    }
+    
+    /* Custom button colors */
+    .btn-primary {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+    
+    .btn-success {
+      background-color: var(--success-color);
+      border-color: var(--success-color);
+    }
+    
+    .btn-danger {
+      background-color: var(--danger-color);
+      border-color: var(--danger-color);
+    }
+    
+    .btn-warning {
+      background-color: var(--warning-color);
+      border-color: var(--warning-color);
+      color: #000;
+    }
+    
+    .btn-info {
+      background-color: var(--info-color);
+      border-color: var(--info-color);
+    }
+  </style>
+</head>
+<body>
+  <div class="container-fluid py-4">
+    <div class="row">
+      <div class="col-lg-11 col-xl-10 mx-auto">
+        <!-- Header -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+          <div>
+            <h4 class="fw-bold mb-1"><i class="fas fa-newspaper me-2"></i>Manage Posts</h4>
+            <p class="text-muted mb-0">Review, approve, and moderate community posts</p>
+          </div>
+          <div class="d-flex gap-2">
+            <form method="get" class="d-flex gap-2 mb-3">
+              <div class="input-group" style="width: 250px;">
+                <input type="text" name="search" id="searchInput" class="form-control"
+                      placeholder="Search posts..." value="{{ search_query }}">
+                <button class="btn btn-outline-secondary" type="submit">
+                  <i class="fas fa-search"></i>
+                </button>
+              </div>
+
+              <select class="form-select" name="status" id="statusFilter" style="width: auto;" onchange="this.form.submit()">
+                <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Statuses</option>
+                <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+                <option value="reported" {% if status_filter == 'reported' %}selected{% endif %}>Reported</option>
+                <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                <option value="archived" {% if status_filter == 'archived' %}selected{% endif %}>Archived</option>
+              </select>
+            </form>
+            <a href="{% url 'dashindex' %}" class="btn btn-outline-primary">
+              <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+            </a>
+          </div>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="row g-4 mb-4">
+          <!-- Total Posts -->
+          <div class="col-md-4">
+            <div class="card border-0 h-100 hover-shadow">
+              <div class="card-body d-flex align-items-center">
+                <div class="bg-primary bg-opacity-15 p-3 rounded-circle me-3">
+                  <i class="fas fa-newspaper fa-2x text-primary"></i>
+                </div>
+                <div>
+                  <h6 class="text-uppercase text-muted mb-1">Total Posts (24hrs)</h6>
+                  <h3 class="mb-0 fw-bold">{{ total_posts }}</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reported Posts -->
+          <div class="col-md-4">
+            <div class="card border-0 h-100 hover-shadow">
+              <div class="card-body d-flex align-items-center">
+                <div class="bg-danger bg-opacity-15 p-3 rounded-circle me-3">
+                  <i class="fas fa-flag fa-2x text-danger"></i>
+                </div>
+                <div>
+                  <h6 class="text-uppercase text-muted mb-1">Reported Received (24hrs)</h6>
+                  <h3 class="mb-0 fw-bold">{{ reported }}</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Warnings Sent -->
+          <div class="col-md-4">
+            <div class="card border-0 h-100 hover-shadow">
+              <div class="card-body d-flex align-items-center">
+                <div class="bg-warning bg-opacity-15 p-3 rounded-circle me-3">
+                  <i class="fas fa-exclamation-triangle fa-2x text-warning"></i>
+                </div>
+                <div>
+                  <h6 class="text-uppercase text-muted mb-1">Warnings Sent (24hrs)</h6>
+                  <h3 class="mb-0 fw-bold">{{ total_warnings }}</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="card mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Post Management</h5>
+
+            <!-- Small Stats Box -->
+            <div class="card border-0 shadow-sm p-2" style="width: 150px;">
+              <div class="text-end">
+                <h6 class="text-uppercase text-muted mb-1">Total Users</h6>
+                <h3 class="mb-0 fw-bold">{{ total_users }}</h3>
+              </div>
+            </div>
+          </div>
+          </div>
+          <div class="card-body">
+            <ul class="nav nav-tabs mb-4">
+              <li class="nav-item">
+                <a class="nav-link {% if active_tab == 'all' %}active{% endif %}"
+                  href="{% url 'reportedposts' %}?filter=all">All Posts</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link {% if active_tab == 'reported' %}active{% endif %}"
+                  href="{% url 'reportedposts' %}?filter=reported">Reported Content</a>
+              </li>
+              <!---CHECK IF IT NEEDED--->
+              <!---
+              <li class="nav-item">
+                <a class="nav-link" href="#">Pending Review</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Scheduled</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Reported Content</a>
+              </li>
+              --->
+            </ul>
+            
+            <div class="table-responsive">
+              <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Author</th>
+                      <th>Content</th>
+                      <th>Media</th>
+                      <th>Date</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="postsTable">
+                  
+              {% for post in posts_data %}
+              <tr>
+                  <td>{{ post.id }}</td>
+                  <td>
+                      <div class="d-flex align-items-center gap-2">
+                          {% if post.profile_picture %}
+                              <img src="{{ post.profile_picture }}" width="40" height="40" class="rounded-circle">
+                          {% else %}
+                              <img src="https://i.pravatar.cc/40" class="rounded-circle">
+                          {% endif %}
+                          <div class="d-flex flex-column">
+                              <strong>{{ post.author_username }}</strong>
+                              {% if post.profile_name %}
+                                  <small class="text-muted">{{ post.profile_name }}</small>
+                              {% endif %}
+                          </div>
+                      </div>
+                  </td>
+
+                  <td>{{ post.content|truncatewords:10 }}</td>
+                  <td>
+                      {% if post.media %}
+                          <a href="{{ post.media }}" target="_blank">
+                              <img src="{{ post.media }}" width="50" height="50" alt="Media" class="rounded">
+                          </a>
+                      {% else %}
+                          -
+                      {% endif %}
+                  </td>
+                  <td>{{ post.date|date:"Y-m-d H:i" }}</td>
+                  <td>
+                      {% if post.status == "Reported" %}
+                          <span class="badge bg-danger">Reported</span>
+                      {% else %}
+                          <span class="badge bg-success">Active</span>
+                      {% endif %}
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      <!-- Eye / View Details -->
+                      <button type="button" class="btn btn-sm btn-primary view-details"
+        data-post-id="{{ post.id }}"
+        data-detail-url="{% url 'post_detail_api' post.id %}"
+        data-comments-url="{% url 'post_comments_api' post.id %}">
+  <i class="fas fa-eye"></i>
+</button>
+
+                      
+                      {% if post.status == "Reported" %}
+                          <!-- Ban User -->
+                          <form method="post" action="{% url 'ban_user' post.author_id %}" class="d-inline">
+                              {% csrf_token %}
+                              {% with member=post.author.managemember_set.first %}
+                                  {% if member %}
+                                      <button type="submit" class="btn btn-sm {% if member.status %}btn-warning{% else %}btn-success{% endif %}">
+                                          {% if member.status %}Ban{% else %}Unban{% endif %}
+                                      </button>
+                                  {% else %}
+                                      <button type="submit" class="btn btn-sm btn-warning">Ban</button>
+                                  {% endif %}
+                              {% endwith %}
+                          </form>
+
+                          <!-- Delete Post -->
+                          <form method="post" action="{% url 'delete_post' post.id %}" class="d-inline">
+                              {% csrf_token %}
+                              <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                          </form>
+
+                          <!-- Reply / Warning -->
+                          <form method="post" action="{% url 'warn_user' post.id %}" class="d-inline">
+                              {% csrf_token %}
+                              <button type="submit" class="btn btn-sm btn-info"><i class="fas fa-reply"></i></button>
+                          </form>
+                      {% endif %}
+                    </div>
+                  </td>
+              </tr>
+              {% endfor %}
+
+                  </tbody>
+              </table>
+
+            </div>
+            
+            <!-- Pagination -->
+            <nav class="mt-3">
+              <ul class="pagination justify-content-center">
+
+                {# Previous button #}
+                {% if page_obj.has_previous %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}&status={{ status_filter }}">Previous</a>
+                  </li>
+                {% else %}
+                  <li class="page-item disabled">
+                    <span class="page-link">Previous</span>
+                  </li>
+                {% endif %}
+
+                {# Page numbers #}
+                {% for num in page_obj.paginator.page_range %}
+                  {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                  {% else %}
+                    <li class="page-item">
+                      <a class="page-link" href="?page={{ num }}&search={{ search_query }}&status={{ status_filter }}">{{ num }}</a>
+                    </li>
+                  {% endif %}
+                {% endfor %}
+
+                {# Next button #}
+                {% if page_obj.has_next %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}&search={{ search_query }}&status={{ status_filter }}">Next</a>
+                  </li>
+                {% else %}
+                  <li class="page-item disabled">
+                    <span class="page-link">Next</span>
+                  </li>
+                {% endif %}
+
+              </ul>
+            </nav>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Post Detail Modal -->
+  <div class="modal fade" id="postDetailModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title"><i class="fas fa-file-alt me-2"></i>Post Details</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              
+              <div class="modal-tabs">
+                <ul class="nav nav-tabs border-0">
+                  <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#postContentTab">
+                      <i class="fas fa-file-alt me-1"></i> Post Content
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#commentsTab">
+                      <i class="fas fa-comments me-1"></i> Comments
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              
+              <div class="modal-body">
+                <div class="tab-content">
+                  <div class="tab-pane fade show active" id="postContentTab">
+                    <div id="postDetailContent">
+                      <div class="loading-spinner">
+                        <div class="spinner-border text-primary" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="tab-pane fade" id="commentsTab">
+                    <div id="commentsContent">
+                      <div class="loading-spinner">
+                        <div class="spinner-border text-primary" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="modal-footer">
+  <!-- these must be present in the modal template -->
+  <button id="approveBtn" class="btn btn-success">Approve</button>
+  <button id="rejectBtn" class="btn btn-danger">Reject</button>
+  <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+</div>
+
+          </div>
+      </div>
+  </div>
+
+  <!-- Bootstrap & jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+(function($){
+  // --- CSRF helper ---
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+      const cookies = document.cookie.split(";");
+      for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.substring(0, name.length + 1) === (name + "=")) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  // attach CSRF token to all non-GET AJAX requests
+  $.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+      if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+        xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+      }
+    }
+  });
+
+  $(function() {
+    // Delegated handler for "eye" buttons
+    $(document).on('click', '.view-details', function(e) {
+      e.preventDefault();
+
+      const $btn = $(this);
+      const detailUrl = $btn.data('detail-url');
+      const commentsUrl = $btn.data('comments-url');
+      const postId = $btn.data('post-id') || $btn.data('id');
+
+      // Show modal
+      const modalEl = document.getElementById('postDetailModal');
+      const modal = new bootstrap.Modal(modalEl);
+      modal.show();
+
+      // Make sure approve/reject buttons exist in modal footer with these IDs:
+      // #approveBtn and #rejectBtn  (see HTML note below)
+      $('#approveBtn').attr('data-id', postId).show();
+      $('#rejectBtn').attr('data-id', postId).show();
+
+      // Spinner HTML
+      const spinner = `<div class="d-flex justify-content-center py-4">
+                         <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+                       </div>`;
+
+      // --- Load post content ---
+      $('#postDetailContent').html(spinner);
+      if (!detailUrl) {
+        $('#postDetailContent').html('<p class="text-danger">Detail URL not provided.</p>');
+      } else {
+        $.get(detailUrl)
+          .done(function(data) {
+            // If your API returns raw HTML instead of JSON, adjust accordingly.
+            // Expecting JSON object like { author_username, profile_picture, content, media, date, likes, comments_count, status? }
+            const mediaHtml = data.media ? `<div class="post-media mb-3"><img src="${data.media}" class="img-fluid rounded" style="max-height:360px; width:auto;"></div>` : '';
+            const postHtml = `
+              <div class="post-meta d-flex align-items-center mb-2">
+                <img src="${data.profile_picture || 'https://i.pravatar.cc/48'}" class="rounded-circle me-2" width="48" height="48">
+                <div>
+                  <h6 class="mb-0">${data.author_username}</h6>
+                  <small class="text-muted">Posted on ${data.date || ''}</small>
+                </div>
+              </div>
+              <div class="post-content mb-3"><p>${data.content || ''}</p></div>
+              ${mediaHtml}
+              <div class="post-stats d-flex gap-3">
+                <div><i class="fas fa-heart text-danger"></i> ${data.likes || 0} likes</div>
+                <div><i class="fas fa-comment text-primary"></i> ${data.comments_count || 0} comments</div>
+              </div>
+            `;
+            $('#postDetailContent').html(postHtml);
+
+            // optionally hide approve if already active (API should return status if possible)
+            if (data.status && String(data.status).toLowerCase() !== 'reported') {
+              $('#approveBtn').hide();
+            } else {
+              $('#approveBtn').show();
+            }
+          })
+          .fail(function() {
+            $('#postDetailContent').html('<p class="text-danger">Failed to load post details.</p>');
+          });
+      }
+
+      // --- Load comments immediately ---
+      $('#commentsContent').html(spinner);
+      if (!commentsUrl) {
+        $('#commentsContent').html('<p class="text-danger">Comments URL not provided.</p>');
+      } else {
+        $.get(commentsUrl)
+          .done(function(resp) {
+            // expecting JSON: { comments: [ { author_username, profile_picture, content, date }, ... ] }
+            const comments = resp.comments || [];
+            if (comments.length === 0) {
+              $('#commentsContent').html('<p class="text-muted">No comments on this post yet.</p>');
+              return;
+            }
+            let html = '';
+            comments.forEach(function(c) {
+              html += `
+                <div class="comment mb-3">
+                  <div class="d-flex align-items-center mb-1">
+                    <img src="${c.profile_picture || 'https://i.pravatar.cc/36'}" class="rounded-circle me-2" width="36" height="36">
+                    <div>
+                      <strong>${c.author_username}</strong><br>
+                      <small class="text-muted">${c.date || ''}</small>
+                    </div>
+                  </div>
+                  <div class="comment-content ps-5">
+                    <p>${c.content}</p>
+                  </div>
+                </div>
+                <hr class="my-2">
+              `;
+            });
+            $('#commentsContent').html(html);
+          })
+          .fail(function() {
+            $('#commentsContent').html('<p class="text-danger">Failed to load comments.</p>');
+          });
+      }
+    }); // end view-details click
+
+    // Approve (delegated) - mark reported -> active
+    $(document).on('click', '#approveBtn', function(e) {
+      e.preventDefault();
+      const postId = $(this).attr('data-id');
+      if (!postId) return alert('Post id missing');
+
+      $(this).prop('disabled', true).text('Approving...');
+      $.ajax({
+        url: `/dashboard/posts/${postId}/approve/`,
+        type: 'POST'
+      }).done(function(res) {
+        // success: close modal and reload to reflect updated status
+        bootstrap.Modal.getInstance(document.getElementById('postDetailModal')).hide();
+        location.reload();
+      }).fail(function(xhr) {
+        alert('Failed to approve post.');
+        $('#approveBtn').prop('disabled', false).text('Approve');
+      });
+    });
+
+    // Reject (delegated) - delete post
+    $(document).on('click', '#rejectBtn', function(e) {
+      e.preventDefault();
+      const postId = $(this).attr('data-id');
+      if (!postId) return alert('Post id missing');
+
+      if (!confirm('Are you sure you want to delete this post? This cannot be undone.')) return;
+
+      $(this).prop('disabled', true).text('Deleting...');
+      $.ajax({
+        url: `/dashboard/posts/${postId}/reject/`,
+        type: 'POST'
+      }).done(function(res) {
+        bootstrap.Modal.getInstance(document.getElementById('postDetailModal')).hide();
+        location.reload();
+      }).fail(function(xhr) {
+        alert('Failed to delete post.');
+        $('#rejectBtn').prop('disabled', false).text('Reject');
+      });
+    });
+
+    // Clear modal on close
+    $('#postDetailModal').on('hidden.bs.modal', function() {
+      $('#postDetailContent').empty();
+      $('#commentsContent').empty();
+      $('#approveBtn, #rejectBtn').removeAttr('data-id').show().prop('disabled', false).text(function(){ return $(this).is('#approveBtn') ? 'Approve' : 'Reject'; });
+    });
+  });
+})(jQuery);
+</script>
+
+</body>
+</html>
