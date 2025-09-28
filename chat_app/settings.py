@@ -65,6 +65,7 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'dashboard.middleware.BanCheckMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 # ------------------- URLs -------------------
