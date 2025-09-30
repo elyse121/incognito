@@ -198,6 +198,8 @@ def signup_view(request):
     return render(request, 'signup.html')
 
 
+
+
 def verify_email(request):
     """Handle email verification"""
     token = request.GET.get('token')
