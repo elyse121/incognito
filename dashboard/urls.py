@@ -9,7 +9,7 @@ urlpatterns = [
     path('allmembers/', views.all_members_page, name='all_members_page'),
     #path('privatemessages/', views.privatemessages, name='privatemessages'),
 
-    path("private-messages/", views.private_messages_admin, name="private_messages_admin"),
+    #path("private-messages/", views.private_messages_admin, name="private_messages_admin"),
     path("api/check-admin-password/", views.check_admin_password, name="check_admin_password"),
     path("api/conversation/", views.conversation_api, name="conversation_api"),
 
@@ -27,7 +27,7 @@ urlpatterns = [
     #path("api/toggle_ban_user/", views.toggle_ban_user, name="toggle_ban_user"),
     path("toggle-block-conversation/", views.toggle_block_conversation, name="toggle_block_conversation"),
     #path("contact-admin/", views.banned_account_page_contact_admin, name='contact_admin'), #banned_account_page_contact_admin
-    path("private-messages/", views.private_messages_admin, name="private_messages_admin"),
+    #path("private-messages/", views.private_messages_admin, name="private_messages_admin"),
     path("api/conversation/", views.conversation_api, name="conversation_api"),
 
     #noticitations count
