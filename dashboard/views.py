@@ -229,16 +229,14 @@ from chat.models import Message
 
 
 # Existing view for admin page
-from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Q
-from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from chat.models import Message
 from dashboard.models import ManageMember
 
-@login_required
+
 def is_admin(user):
     return user.is_active and user.is_staff and user.is_superuser
 
@@ -267,19 +265,17 @@ def private_messages_admin(request):
         )
 
     # Apply status filter (based on ManageMember table)
-
     if status_filter == "active":
         users = users.filter(managed_memberships__status=True)
     elif status_filter == "banned":
         users = users.filter(managed_memberships__status=False)
 
-
     members_data = []
-    for user in users:
-        user_msgs = Message.objects.filter(Q(sender=user) | Q(receiver=user))
+    for u in users:
+        user_msgs = Message.objects.filter(Q(sender=u) | Q(receiver=u))
 
-        senders = set(user_msgs.exclude(sender=user).values_list("sender_id", flat=True))
-        receivers = set(user_msgs.exclude(receiver=user).values_list("receiver_id", flat=True))
+        senders = set(user_msgs.exclude(sender=u).values_list("sender_id", flat=True))
+        receivers = set(user_msgs.exclude(receiver=u).values_list("receiver_id", flat=True))
         partner_ids = senders.union(receivers)
 
         partners = User.objects.filter(id__in=partner_ids)
@@ -287,20 +283,21 @@ def private_messages_admin(request):
         last_active_msg = user_msgs.order_by("-timestamp").first()
         last_active = last_active_msg.timestamp if last_active_msg else None
 
-        member_record = ManageMember.objects.filter(member=user).first()
+        # ✅ fetch ManageMember record
+        member_record = u.managed_memberships.first()
         status = member_record.status if member_record else None
 
         members_data.append(
             {
-                "id": user.id,
-                "username": user.username,
-                "email": user.email,
-                "avatar_url": user.userprofile.profile_picture.url
-                if hasattr(user, "userprofile") and user.userprofile.profile_picture
+                "id": u.id,
+                "username": u.username,
+                "email": u.email,
+                "avatar_url": u.userprofile.profile_picture.url
+                if hasattr(u, "userprofile") and u.userprofile.profile_picture
                 else "https://via.placeholder.com/40",
                 "partners_count": partners.count(),
                 "last_active": last_active,
-                "status": status,
+                "status": status,   # ✅ from ManageMember
                 "partners": [
                     {
                         "id": p.id,
@@ -324,7 +321,6 @@ def private_messages_admin(request):
             "status_filter": status_filter,  # pass back to template
         },
     )
-
 
 
 @login_required
