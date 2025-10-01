@@ -1886,11 +1886,9 @@ def privacydash(request):
 
     return render(request, 'DASHBOARD/newcode/html/PrivacyDash.html', context)
 
-
 #password_check
 import re
 
-@login_required
 def check_password_strength(password: str) -> str:
     if not password:
         return "weak"
