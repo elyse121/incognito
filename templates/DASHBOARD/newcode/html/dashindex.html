@@ -1257,18 +1257,80 @@ body.fullscreen .header-bar {
             <i class="bi bi-list"></i>
             <span class="tooltip">Toggle Sidebar</span>
           </button>
-          <button class="header-icon-btn" id="messagesBtn">
-            <i class="bi bi-chat-left-dots"></i>
-            <span class="tooltip">Messages</span>
+          <button class="header-icon-btn" id="messagesBtn" onclick="window.location.href='{% url 'view_notifications' %}'">
+              <i class="bi bi-chat-left-dots"></i>
+              <span class="tooltip">Messages</span>
           </button>
           <button class="header-icon-btn" id="mentionsBtn">
             <i class="bi bi-at"></i>
             <span class="tooltip">Mentions</span>
           </button>
-          <button class="header-icon-btn" id="clipboardBtn">
-            <i class="bi bi-clipboard"></i>
-            <span class="tooltip">Clipboard</span>
+          <!-- Include flatpickr CSS & JS -->
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+          <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+          <!-- Button -->
+          <button class="header-icon-btn" id="calendarBtn">
+            <i class="bi bi-calendar4"></i>
+            <span class="tooltip">Calendar</span>
           </button>
+
+          <!-- Popup container -->
+          <div id="calendarPopup" class="calendar-popup">
+            <input type="text" id="calendarInput">
+          </div>
+
+          <style>
+          /* Popup styling */
+          .calendar-popup {
+            display: none;
+            
+            position: relative;
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+            z-index: 1000;
+          }
+          </style>
+
+          <script>
+          const btn = document.getElementById('calendarBtn');
+          const popup = document.getElementById('calendarPopup');
+          const input = document.getElementById('calendarInput');
+
+          // Initialize flatpickr
+          flatpickr(input, {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            onClose: function(selectedDates, dateStr) {
+              console.log("Selected:", dateStr);
+            }
+          });
+
+          // Show popup under button
+          btn.addEventListener('click', (e) => {
+            const rect = btn.getBoundingClientRect();
+            popup.style.top = rect.bottom + window.scrollY + "px"; // below button
+            popup.style.left = rect.left + window.scrollX + "px";  // align left
+            popup.style.display = 'block';
+            input._flatpickr.open();
+            e.stopPropagation(); // prevent outside click
+          });
+
+          // Close popup if clicked outside
+          window.addEventListener('click', (e) => {
+            if (!popup.contains(e.target) && e.target !== btn) {
+              popup.style.display = 'none';
+            }
+          });
+
+          // Stop propagation inside input
+          input.addEventListener('click', (e) => {
+            e.stopPropagation();
+          });
+          </script>
         </div>
 
         <!-- Search bar -->
@@ -1286,53 +1348,95 @@ body.fullscreen .header-bar {
             <i class="bi bi-fullscreen"></i>
             <span class="tooltip">Fullscreen</span>
           </button>
-          <button class="header-icon-btn notification-btn" id="notificationsBtn">
-    <i class="bi bi-bell"></i>
-    <span class="notification-badge" id="notificationCount">0</span>
-    <span class="tooltip">Notifications</span>
-</button>
+          <button class="header-icon-btn notification-btn" id="notificationsBtn" onclick="window.location.href='{% url 'view_notifications' %}'">
+              <i class="bi bi-bell"></i>
+              <span class="notification-badge" id="notificationCount">0</span>
+              <span class="tooltip">Notifications</span>
+          </button>
 
-<script>
-// Function to load notification count
-function loadNotificationCount() {
-    fetch('/get_notification_count/')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            updateNotificationCount(data.count);
-        })
-        .catch(error => {
-            console.error('Error fetching notification count:', error);
-        });
-}
-
-// Function to update notification badge count
-function updateNotificationCount(count) {
-    const badge = document.getElementById('notificationCount');
-    if (badge) {
-        badge.textContent = count;
-        
-        // Show/hide badge based on count
-        if (count > 0) {
-            badge.style.display = 'flex';
-        } else {
-            badge.style.display = 'none';
-        }
-    }
-}
-
-// Load notification count when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    loadNotificationCount();
-    
-    // Optional: Refresh count every 60 seconds
-    setInterval(loadNotificationCount, 60000);
-});
-</script>
+          <script>
+          // Function to load notification count
+          function loadNotificationCount() {
+              fetch('/get_notification_count/')
+                  .then(response => {
+                      if (!response.ok) {
+                          throw new Error('Network response was not ok');
+                      }
+                      return response.json();
+                  })
+                  .then(data => {
+                      updateNotificationCount(data.count);
+                  })
+                  .catch(error => {
+                      console.error('Error fetching notification count:', error);
+                  });
+          }
+          
+          // Function to update notification badge count
+          function updateNotificationCount(count) {
+              const badge = document.getElementById('notificationCount');
+              if (badge) {
+                  badge.textContent = count;
+                  
+                  // Show/hide badge based on count
+                  if (count > 0) {
+                      badge.style.display = 'flex';
+                  } else {
+                      badge.style.display = 'none';
+                  }
+              }
+          }
+          
+          // Load notification count when page loads
+          document.addEventListener('DOMContentLoaded', function() {
+              loadNotificationCount();
+              
+              // Optional: Refresh count every 60 seconds
+              setInterval(loadNotificationCount, 60000);
+          });
+          </script>
+          
+          <script>
+          // Function to load notification count
+          function loadNotificationCount() {
+              fetch('/get_notification_count/')
+                  .then(response => {
+                      if (!response.ok) {
+                          throw new Error('Network response was not ok');
+                      }
+                      return response.json();
+                  })
+                  .then(data => {
+                      updateNotificationCount(data.count);
+                  })
+                  .catch(error => {
+                      console.error('Error fetching notification count:', error);
+                  });
+          }
+          
+          // Function to update notification badge count
+          function updateNotificationCount(count) {
+              const badge = document.getElementById('notificationCount');
+              if (badge) {
+                  badge.textContent = count;
+                  
+                  // Show/hide badge based on count
+                  if (count > 0) {
+                      badge.style.display = 'flex';
+                  } else {
+                      badge.style.display = 'none';
+                  }
+              }
+          }
+          
+          // Load notification count when page loads
+          document.addEventListener('DOMContentLoaded', function() {
+              loadNotificationCount();
+              
+              // Optional: Refresh count every 60 seconds
+              setInterval(loadNotificationCount, 60000);
+          });
+          </script>
           <div class="user-avatar" id="userProfile">
             <img src="{% static 'DASHBOARD/pics/me.jpg' %}" alt="User Avatar">
             <span class="tooltip">Profile</span>
